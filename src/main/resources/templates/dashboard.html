@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Screening Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* =========================================================
+           NAVBAR
+           ========================================================= */
+
+        .navbar {
+            background: #111827;
+            color: white;
+
+            padding: 24px 50px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-interview-nav {
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 14px 20px;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+            font-weight: bold;
+
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .ai-interview-nav:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .logout {
+            background: #ef2929;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 14px 25px;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+        }
+
+        .logout:hover {
+            background: #dc2626;
+        }
+
+        /* =========================================================
+           MAIN CONTAINER
+           ========================================================= */
+
+        .container {
+            width: 94%;
+            max-width: 1500px;
+
+            margin: 40px auto;
+        }
+
+        /* =========================================================
+           WELCOME
+           ========================================================= */
+
+        .welcome {
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+
+            margin-bottom: 30px;
+        }
+
+        .welcome h2 {
+            font-size: 38px;
+
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .welcome p {
+            font-size: 18px;
+
+            color: #64748b;
+
+            margin-bottom: 0;
+        }
+
+        /* =========================================================
+           STATISTICS
+           ========================================================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+
+            padding: 28px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            border-left: 5px solid #2563eb;
+        }
+
+        .stat-card.green {
+            border-left-color: #16a34a;
+        }
+
+        .stat-card.red {
+            border-left-color: #dc2626;
+        }
+
+        .stat-card.yellow {
+            border-left-color: #eab308;
+        }
+
+        .stat-card.purple {
+            border-left-color: #7c3aed;
+        }
+
+        .stat-title {
+            font-size: 15px;
+
+            font-weight: bold;
+
+            color: #64748b;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 38px;
+
+            font-weight: bold;
+
+            color: #2563eb;
+        }
+
+        .green .stat-number {
+            color: #16a34a;
+        }
+
+        .red .stat-number {
+            color: #dc2626;
+        }
+
+        .yellow .stat-number {
+            color: #ca8a04;
+        }
+
+        .purple .stat-number {
+            color: #7c3aed;
+        }
+
+        /* =========================================================
+           SECTION TITLE
+           ========================================================= */
+
+        .section-title {
+            font-size: 28px;
+
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* =========================================================
+           FEATURE CARDS
+           ========================================================= */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 25px;
+
+            margin-bottom: 30px;
+        }
+
+        .card-link {
+            text-decoration: none;
+
+            color: inherit;
+
+            display: block;
+        }
+
+        .card {
+            background: white;
+
+            min-height: 200px;
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .card h3 {
+            font-size: 25px;
+
+            color: #2563eb;
+
+            margin-top: 0;
+
+            margin-bottom: 18px;
+        }
+
+        /* AI INTERVIEW CARD */
+
+        .card.ai-interview-card {
+            border-top: 5px solid #7c3aed;
+        }
+
+        .card.ai-interview-card h3 {
+            color: #7c3aed;
+        }
+
+        .ai-interview-button {
+            background: #7c3aed;
+        }
+
+        .ai-interview-button:hover {
+            background: #6d28d9;
+        }
+
+        .card p {
+            font-size: 17px;
+
+            color: #475569;
+
+            line-height: 1.6;
+        }
+
+        .card-button {
+            display: inline-block;
+
+            margin-top: 10px;
+
+            padding: 10px 18px;
+
+            background: #2563eb;
+
+            color: white;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+        }
+
+        /* =========================================================
+           RECRUITMENT OVERVIEW
+           ========================================================= */
+
+        .overview {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+
+            margin-bottom: 30px;
+        }
+
+        .overview h3 {
+            margin-top: 0;
+
+            font-size: 24px;
+        }
+
+        .overview-row {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr 1fr;
+
+            gap: 20px;
+        }
+
+        .overview-item {
+            padding: 20px;
+
+            border-radius: 12px;
+
+            background: #f8fafc;
+        }
+
+        .overview-item strong {
+            display: block;
+
+            font-size: 28px;
+
+            margin-bottom: 6px;
+        }
+
+        .overview-item span {
+            color: #64748b;
+
+            font-size: 15px;
+        }
+
+        /* =========================================================
+           MOBILE
+           ========================================================= */
+
+        @media (max-width: 1100px) {
+
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .cards {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .overview-row {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                padding: 20px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+                align-items: stretch;
+            }
+
+            .navbar h1 {
+                font-size: 22px;
+
+                text-align: center;
+            }
+
+            .nav-actions {
+                justify-content: center;
+
+                flex-wrap: wrap;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h2 {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 AI Resume Screening
+    </h1>
+
+    <div class="nav-actions">
+
+        <!-- NEW AI INTERVIEW BUTTON -->
+
+        <a href="/ai-interview-questions"
+           class="ai-interview-nav">
+            🤖 AI Interview Assistant
+        </a>
+
+        <!-- LOGOUT -->
+
+        <a href="/logout"
+           class="logout">
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     MAIN
+     ========================================================= -->
+
+<div class="container">
+
+
+    <!-- =====================================================
+         WELCOME
+         ===================================================== -->
+
+    <div class="welcome">
+
+        <h2>
+            Welcome, Admin 👋
+        </h2>
+
+        <p>
+            Manage candidates, jobs and AI-powered resume
+            screening from one dashboard.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         LIVE STATISTICS
+         ===================================================== -->
+
+    <div class="stats">
+
+
+        <!-- TOTAL CANDIDATES -->
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Total Candidates
+            </div>
+
+            <div class="stat-number"
+                 th:text="${totalCandidates}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- PENDING -->
+
+        <div class="stat-card yellow">
+
+            <div class="stat-title">
+                Pending Candidates
+            </div>
+
+            <div class="stat-number"
+                 th:text="${pendingCandidates}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- SHORTLISTED -->
+
+        <div class="stat-card green">
+
+            <div class="stat-title">
+                Shortlisted
+            </div>
+
+            <div class="stat-number"
+                 th:text="${shortlistedCandidates}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- REJECTED -->
+
+        <div class="stat-card red">
+
+            <div class="stat-title">
+                Rejected
+            </div>
+
+            <div class="stat-number"
+                 th:text="${rejectedCandidates}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- TOTAL JOBS -->
+
+        <div class="stat-card purple">
+
+            <div class="stat-title">
+                Total Jobs
+            </div>
+
+            <div class="stat-number"
+                 th:text="${totalJobs}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVE JOBS -->
+
+        <div class="stat-card green">
+
+            <div class="stat-title">
+                Active Jobs
+            </div>
+
+            <div class="stat-number"
+                 th:text="${activeJobs}">
+                0
+            </div>
+
+        </div>
+
+
+        <!-- INACTIVE JOBS -->
+
+        <div class="stat-card red">
+
+            <div class="stat-title">
+                Inactive Jobs
+            </div>
+
+            <div class="stat-number"
+                 th:text="${inactiveJobs}">
+                0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         MANAGEMENT SECTION
+         ===================================================== -->
+
+    <h2 class="section-title">
+        Recruitment Management
+    </h2>
+
+
+    <div class="cards">
+
+
+        <!-- CANDIDATE MANAGEMENT -->
+
+        <a href="/candidate-management"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    👥 Candidate Management
+                </h3>
+
+                <p>
+                    View, edit and manage all candidates
+                    registered in the system.
+                </p>
+
+                <span class="card-button">
+                    Manage Candidates →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- JOB MANAGEMENT -->
+
+        <a href="/job-management"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    💼 Job Management
+                </h3>
+
+                <p>
+                    Create, edit, activate, deactivate and
+                    manage recruitment jobs.
+                </p>
+
+                <span class="card-button">
+                    Manage Jobs →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- AI SCREENING -->
+
+        <a href="/ai-screening"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    🤖 AI Resume Screening
+                </h3>
+
+                <p>
+                    Analyze candidate resumes against job
+                    requirements and calculate ATS scores.
+                </p>
+
+                <span class="card-button">
+                    Analyze Resume →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- CANDIDATE RANKING -->
+
+        <a href="/candidate-ranking?jobId=1"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    🏆 Candidate Ranking
+                </h3>
+
+                <p>
+                    Automatically rank candidates according
+                    to their ATS compatibility with a job.
+                </p>
+
+                <span class="card-button">
+                    Rank Candidates →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- RESUMES -->
+
+        <a href="/resumes"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    📄 Resume Management
+                </h3>
+
+                <p>
+                    Upload and manage candidate resume
+                    documents.
+                </p>
+
+                <span class="card-button">
+                    Manage Resumes →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- JOB CREATION -->
+
+        <a href="/jobs"
+           class="card-link">
+
+            <div class="card">
+
+                <h3>
+                    ➕ Create Job
+                </h3>
+
+                <p>
+                    Create a new recruitment job with
+                    required and preferred skills.
+                </p>
+
+                <span class="card-button">
+                    Create Job →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- JOB APPLICATIONS -->
+
+        <a href="/applications" class="card-link">
+            <div class="card">
+                <h3>📥 Job Applications</h3>
+                <p>Review applications submitted by registered candidates.</p>
+                <span class="card-button">View Applications →</span>
+            </div>
+        </a>
+
+
+        <!-- =================================================
+             NEW AI INTERVIEW QUESTIONS
+             ================================================= -->
+
+        <a href="/ai-interview-questions"
+           class="card-link">
+
+            <div class="card ai-interview-card">
+
+                <h3>
+                    🤖 AI Interview Assistant
+                </h3>
+
+                <p>
+                    Generate personalized interview questions
+                    from the candidate's uploaded resume.
+                    Choose technical, project-based, HR or
+                    mixed questions with different difficulty
+                    levels and prepare an interview sheet.
+                </p>
+
+                <span class="card-button ai-interview-button">
+                    Start Interview Assistant →
+                </span>
+
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- =====================================================
+         RECRUITMENT OVERVIEW
+         ===================================================== -->
+
+    <div class="overview">
+
+        <h3>
+            📊 Recruitment Overview
+        </h3>
+
+        <div class="overview-row">
+
+
+            <!-- SHORTLISTED -->
+
+            <div class="overview-item">
+
+                <strong
+                    th:text="${shortlistedCandidates}">
+                    0
+                </strong>
+
+                <span>
+                    Candidates shortlisted for the next stage
+                </span>
+
+            </div>
+
+
+            <!-- PENDING -->
+
+            <div class="overview-item">
+
+                <strong
+                    th:text="${pendingCandidates}">
+                    0
+                </strong>
+
+                <span>
+                    Candidates waiting for review
+                </span>
+
+            </div>
+
+
+            <!-- ACTIVE JOBS -->
+
+            <div class="overview-item">
+
+                <strong
+                    th:text="${activeJobs}">
+                    0
+                </strong>
+
+                <span>
+                    Active recruitment jobs
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${job.title + ' - AI Resume Screening'}">Job Details</title>
+    <style>
+        * { box-sizing: border-box; } body { margin:0; font-family:Arial,sans-serif; background:#f3f6fa; color:#111827; } .navbar { background:#111827; color:white; padding:22px 50px; display:flex; justify-content:space-between; align-items:center; gap:15px; } .navbar h1 { margin:0; font-size:26px; } .navbar a { color:white; text-decoration:none; font-weight:bold; } .container { width:92%; max-width:1000px; margin:40px auto 60px; } .card { background:white; border-radius:18px; padding:35px; box-shadow:0 5px 25px rgba(0,0,0,.08); } .eyebrow { color:#2563eb; font-weight:bold; font-size:13px; letter-spacing:.05em; } h2 { margin:10px 0; font-size:32px; } .location { color:#64748b; } .section { margin-top:28px; } .section h3 { margin-bottom:12px; } .description { line-height:1.65; color:#475569; white-space:pre-line; } .tag { display:inline-block; background:#e0ecff; color:#1d4ed8; padding:7px 12px; margin:4px 5px 0 0; border-radius:20px; font-size:13px; } .preferred { background:#f5f3ff; color:#7c3aed; } .contact { background:#f8fafc; border-radius:12px; padding:18px; line-height:1.8; color:#475569; } .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:32px; padding-top:25px; border-top:1px solid #e5e7eb; } .btn { display:inline-block; padding:13px 21px; border-radius:8px; font-weight:bold; text-decoration:none; } .primary { background:#2563eb; color:white; } .back { background:#e2e8f0; color:#334155; } @media(max-width:650px) { .navbar { padding:20px; } .container { width:90%; } .card { padding:24px; } h2 { font-size:26px; } }
+    </style>
+</head>
+<body>
+<header class="navbar"><h1>AI Resume Screening</h1><a href="/jobs/browse">← Available Jobs</a></header>
+<main class="container"><article class="card">
+    <div class="eyebrow">OPEN POSITION</div><h2 th:text="${job.title}">Java Developer</h2><p class="location" th:if="${job.location != null and !job.location.isBlank()}" th:text="${'Location: ' + job.location}">Location: Remote</p>
+    <section class="section"><h3>About the role</h3><div class="description" th:text="${job.description}">Description</div></section>
+    <section class="section"><h3>Required skills</h3><div th:if="${job.requiredSkills != null and !job.requiredSkills.isBlank()}"><span class="tag" th:each="skill : ${#strings.arraySplit(job.requiredSkills, ',')}" th:text="${#strings.trim(skill)}">Java</span></div><p th:if="${job.requiredSkills == null or job.requiredSkills.isBlank()}">Not specified.</p></section>
+    <section class="section"><h3>Preferred skills</h3><div th:if="${job.preferredSkills != null and !job.preferredSkills.isBlank()}"><span class="tag preferred" th:each="skill : ${#strings.arraySplit(job.preferredSkills, ',')}" th:text="${#strings.trim(skill)}">Spring Boot</span></div><p th:if="${job.preferredSkills == null or job.preferredSkills.isBlank()}">Not specified.</p></section>
+    <section class="section"><h3>Experience</h3><p th:text="${job.experience ?: 'Not specified'}">2 years</p></section>
+    <section class="section" th:if="${(job.recruiterName != null and !job.recruiterName.isBlank()) or (job.recruiterEmail != null and !job.recruiterEmail.isBlank())}"><h3>Recruiter contact</h3><div class="contact"><div th:if="${job.recruiterName != null and !job.recruiterName.isBlank()}"><strong>Recruiter:</strong> <span th:text="${job.recruiterName}">Recruiter</span></div><div th:if="${job.recruiterEmail != null and !job.recruiterEmail.isBlank()}"><strong>Email:</strong> <a th:href="${'mailto:' + job.recruiterEmail}" th:text="${job.recruiterEmail}">recruiter@example.com</a></div></div></section>
+    <div class="actions"><a class="btn back" href="/jobs/browse">← Back to Jobs</a><a class="btn primary" th:href="@{/apply(jobId=${job.id})}">Apply for this Job</a></div>
+</article></main>
+</body>
+</html>

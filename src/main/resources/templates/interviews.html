@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Interview Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .navbar {
+            background: #111827;
+            color: white;
+
+            padding: 22px 45px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 27px;
+        }
+
+        .dashboard {
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 11px 20px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1500px;
+
+            margin: 35px auto;
+        }
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 27px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        /* =====================================================
+           FORM
+           ===================================================== */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border:
+                1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            outline: none;
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37,99,235,0.12);
+        }
+
+        .save-button {
+
+            margin-top: 22px;
+
+            padding: 14px 25px;
+
+            background: #2563eb;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           TABLE
+           ===================================================== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            min-width: 1200px;
+
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            vertical-align: middle;
+        }
+
+        th {
+
+            background: #111827;
+
+            color: white;
+
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .candidate {
+            font-weight: bold;
+        }
+
+        .job {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .date {
+            font-weight: bold;
+        }
+
+        .time {
+            color: #64748b;
+        }
+
+        /* =====================================================
+           MODE
+           ===================================================== */
+
+        .mode {
+
+            display: inline-block;
+
+            padding: 6px 10px;
+
+            border-radius: 15px;
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 7px 12px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        .scheduled {
+
+            background: #dbeafe;
+
+            color: #1d4ed8;
+        }
+
+        .completed {
+
+            background: #dcfce7;
+
+            color: #15803d;
+        }
+
+        .cancelled {
+
+            background: #fee2e2;
+
+            color: #dc2626;
+        }
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .actions {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+        }
+
+        .action {
+
+            border: none;
+
+            color: white;
+
+            padding: 8px 11px;
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            text-decoration: none;
+        }
+
+        .edit {
+            background: #2563eb;
+        }
+
+        .complete {
+            background: #16a34a;
+        }
+
+        .cancel {
+            background: #f59e0b;
+        }
+
+        .delete {
+            background: #dc2626;
+        }
+
+        .action:hover {
+            opacity: 0.88;
+        }
+
+        .action-form {
+            display: inline;
+        }
+
+        .empty {
+
+            text-align: center;
+
+            padding: 45px;
+
+            color: #64748b;
+        }
+
+        @media(max-width: 800px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                width: 92%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+
+<div class="navbar">
+
+    <h1>
+        📅 Interview Management
+    </h1>
+
+    <a
+        href="/dashboard"
+        class="dashboard">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- =====================================================
+         SCHEDULE INTERVIEW
+         ===================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📅 Schedule New Interview
+        </h2>
+
+        <p class="subtitle">
+            Select a candidate and job, then enter the
+            interview details.
+        </p>
+
+
+        <form
+            action="/interviews/save"
+            method="post">
+
+
+            <div class="form-grid">
+
+
+                <!-- CANDIDATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Candidate
+                    </label>
+
+                    <select
+                        name="candidateId"
+                        required>
+
+                        <option value="">
+                            -- Select Candidate --
+                        </option>
+
+                        <option
+                            th:each="candidate : ${candidates}"
+
+                            th:value="${candidate.id}"
+
+                            th:text="${candidate.name + ' - ' + candidate.email}">
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- JOB -->
+
+                <div class="form-group">
+
+                    <label>
+                        Job
+                    </label>
+
+                    <select
+                        name="jobId"
+                        required>
+
+                        <option value="">
+                            -- Select Job --
+                        </option>
+
+                        <option
+                            th:each="job : ${jobs}"
+
+                            th:value="${job.id}"
+
+                            th:text="${job.title}">
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Interview Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="interviewDate"
+                        required>
+
+                </div>
+
+
+                <!-- TIME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Interview Time
+                    </label>
+
+                    <input
+                        type="time"
+                        name="interviewTime"
+                        required>
+
+                </div>
+
+
+                <!-- MODE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Interview Mode
+                    </label>
+
+                    <select
+                        name="interviewMode"
+                        required>
+
+                        <option value="">
+                            -- Select Mode --
+                        </option>
+
+                        <option value="Online">
+                            Online
+                        </option>
+
+                        <option value="Offline">
+                            Offline
+                        </option>
+
+                        <option value="Phone">
+                            Phone
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- INTERVIEWER -->
+
+                <div class="form-group">
+
+                    <label>
+                        Interviewer
+                    </label>
+
+                    <input
+                        type="text"
+                        name="interviewer"
+                        placeholder="Enter interviewer name"
+                        required>
+
+                </div>
+
+
+                <!-- MEETING LINK -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Meeting Link
+                    </label>
+
+                    <input
+                        type="url"
+                        name="meetingLink"
+                        placeholder="https://meet.google.com/...">
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Interview Notes
+                    </label>
+
+                    <textarea
+                        name="notes"
+                        placeholder="Add interview instructions or notes..."></textarea>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="save-button">
+
+                📅 Schedule Interview
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         INTERVIEW LIST
+         ===================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📋 Scheduled Interviews
+        </h2>
+
+        <p class="subtitle">
+            Manage all candidate interviews.
+        </p>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Candidate
+                    </th>
+
+                    <th>
+                        Job
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Mode
+                    </th>
+
+                    <th>
+                        Interviewer
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                <tr
+                    th:each="interview, stat : ${interviews}">
+
+
+                    <!-- NUMBER -->
+
+                    <td
+                        th:text="${stat.count}">
+                        1
+                    </td>
+
+
+                    <!-- CANDIDATE -->
+
+                    <td>
+
+                        <div
+                            class="candidate"
+                            th:each="candidate : ${candidates}"
+                            th:if="${candidate.id == interview.candidateId}"
+                            th:text="${candidate.name}">
+
+                            Candidate
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- JOB -->
+
+                    <td>
+
+                        <div
+                            class="job"
+                            th:each="job : ${jobs}"
+                            th:if="${job.id == interview.jobId}"
+                            th:text="${job.title}">
+
+                            Job
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        <div
+                            class="date"
+                            th:text="${interview.interviewDate}">
+
+                            2026-08-25
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- TIME -->
+
+                    <td>
+
+                        <div
+                            class="time"
+                            th:text="${interview.interviewTime}">
+
+                            10:00
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- MODE -->
+
+                    <td>
+
+                        <span
+                            class="mode"
+                            th:text="${interview.interviewMode}">
+
+                            Online
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- INTERVIEWER -->
+
+                    <td
+                        th:text="${interview.interviewer}">
+
+                        Interviewer
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        <span
+                            class="status scheduled"
+                            th:if="${interview.isScheduled()}">
+
+                            📅 SCHEDULED
+
+                        </span>
+
+
+                        <span
+                            class="status completed"
+                            th:if="${interview.isCompleted()}">
+
+                            ✓ COMPLETED
+
+                        </span>
+
+
+                        <span
+                            class="status cancelled"
+                            th:if="${interview.isCancelled()}">
+
+                            ✕ CANCELLED
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div class="actions">
+
+
+                            <!-- EDIT -->
+
+                            <a
+                                class="action edit"
+                                th:href="@{/interviews/edit/{id}(id=${interview.id})}">
+
+                                ✏ Edit
+
+                            </a>
+
+
+                            <!-- COMPLETE -->
+
+                            <form
+                                class="action-form"
+                                th:if="${interview.isScheduled()}"
+                                th:action="@{/interviews/complete/{id}(id=${interview.id})}"
+                                method="post">
+
+                                <button
+                                    type="submit"
+                                    class="action complete">
+
+                                    ✓ Complete
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- CANCEL -->
+
+                            <form
+                                class="action-form"
+                                th:if="${interview.isScheduled()}"
+                                th:action="@{/interviews/cancel/{id}(id=${interview.id})}"
+                                method="post">
+
+                                <button
+                                    type="submit"
+                                    class="action cancel">
+
+                                    ✕ Cancel
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                class="action-form"
+                                th:action="@{/interviews/delete/{id}(id=${interview.id})}"
+                                method="post"
+                                onsubmit="return confirm('Delete this interview?');">
+
+                                <button
+                                    type="submit"
+                                    class="action delete">
+
+                                    🗑 Delete
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+                <!-- EMPTY -->
+
+                <tr
+                    th:if="${#lists.isEmpty(interviews)}">
+
+                    <td
+                        colspan="9"
+                        class="empty">
+
+                        📅 No interviews scheduled yet.
+
+                    </td>
+
+                </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

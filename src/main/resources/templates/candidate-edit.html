@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Candidate</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #111827;
+        }
+
+        .navbar {
+            background: #111827;
+            color: white;
+            padding: 22px 50px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            border: none;
+
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            color: white;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .dashboard {
+            background: #2563eb;
+        }
+
+        .back {
+            background: #64748b;
+        }
+
+        .save {
+            background: #16a34a;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 900px;
+            margin: 35px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+
+            border-radius: 16px;
+
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        input,
+        textarea {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            font-family: Arial, sans-serif;
+
+            outline: none;
+
+        }
+
+        input:focus,
+        textarea:focus {
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px rgba(37,99,235,0.12);
+
+        }
+
+        textarea {
+
+            min-height: 120px;
+
+            resize: vertical;
+
+        }
+
+        .readonly {
+
+            background: #f8fafc;
+
+            color: #64748b;
+
+        }
+
+        .actions {
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 30px;
+
+            flex-wrap: wrap;
+
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 Edit Candidate
+    </h1>
+
+    <a
+        href="/dashboard"
+        class="btn dashboard">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<div class="container">
+
+
+    <div class="card">
+
+
+        <h2>
+            ✏ Edit Candidate
+        </h2>
+
+
+        <p class="subtitle">
+
+            Update the candidate's basic information.
+
+        </p>
+
+
+        <!-- ================================================
+             EDIT FORM
+             ================================================ -->
+
+        <form
+            action="/candidate-management/update"
+            method="post">
+
+
+            <!-- ID -->
+
+            <input
+                type="hidden"
+                name="id"
+                th:value="${candidate.id}">
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="name">
+                    Candidate Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    th:value="${candidate.name}"
+                    placeholder="Enter candidate name"
+                    required>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    th:value="${candidate.email}"
+                    placeholder="Enter email"
+                    required>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="form-group">
+
+                <label for="phone">
+                    Phone
+                </label>
+
+                <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    th:value="${candidate.phone}"
+                    placeholder="Enter phone number">
+
+            </div>
+
+
+            <!-- SKILLS -->
+
+            <div class="form-group">
+
+                <label for="skills">
+                    Skills
+                </label>
+
+                <input
+                    type="text"
+                    id="skills"
+                    name="skills"
+                    th:value="${candidate.skills}"
+                    placeholder="Java, Spring Boot, MySQL, Python">
+
+            </div>
+
+
+            <!-- RESUME FILE -->
+
+            <div class="form-group">
+
+                <label>
+                    Resume File
+                </label>
+
+                <input
+                    type="text"
+                    class="readonly"
+                    th:value="${candidate.resumeFileName}"
+                    readonly>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label>
+                    Current Status
+                </label>
+
+                <input
+                    type="text"
+                    class="readonly"
+                    th:value="${candidate.status}"
+                    readonly>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="actions">
+
+
+                <button
+                    type="submit"
+                    class="btn save">
+
+                    💾 Save Changes
+
+                </button>
+
+
+                <a
+                    href="/candidate-management"
+                    class="btn back">
+
+                    ← Cancel
+
+                </a>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

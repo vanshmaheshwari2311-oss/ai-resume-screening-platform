@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analysis</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .navbar {
+            background: #111827;
+            color: white;
+            padding: 18px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background: #374151;
+            padding: 9px 15px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            margin: 0 0 7px;
+            font-size: 30px;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: #6b7280;
+        }
+
+        .candidate-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .candidate-info h2 {
+            margin: 0 0 8px;
+            font-size: 25px;
+        }
+
+        .candidate-info p {
+            margin: 4px 0;
+            color: #6b7280;
+        }
+
+        .score-box {
+            min-width: 140px;
+            text-align: center;
+            padding: 18px;
+            border-radius: 12px;
+            background: #eef2ff;
+        }
+
+        .score {
+            font-size: 42px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .score-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 3px;
+        }
+
+        .match-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 23px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 9px rgba(0,0,0,0.06);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 19px;
+            color: #111827;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .skill {
+            background: #eef2ff;
+            color: #3730a3;
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .missing-skill {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .strength {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .gap {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .text-content {
+            line-height: 1.7;
+            color: #4b5563;
+            white-space: pre-line;
+        }
+
+        .recommendation {
+            background: #eff6ff;
+            border-left: 5px solid #2563eb;
+            padding: 18px;
+            border-radius: 7px;
+            line-height: 1.7;
+            color: #1e3a8a;
+        }
+
+        .analysis-meta {
+            margin-top: 18px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 10px;
+            background: #111827;
+            color: white;
+            text-decoration: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .empty {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 12px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 700px) {
+
+            .candidate-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .score-box {
+                width: 100%;
+            }
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .container {
+                margin-top: 20px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+    <h2>🤖 AI Resume Screening Platform</h2>
+
+    <a href="/candidate-ranking">
+        ← Candidate Ranking
+    </a>
+
+</div>
+
+
+<div class="container">
+
+    <!-- PAGE TITLE -->
+
+    <div class="page-title">
+
+        <h1>🤖 AI Resume Analysis</h1>
+
+        <p>
+            Detailed ATS analysis for the selected candidate.
+        </p>
+
+    </div>
+
+
+    <!-- CANDIDATE INFORMATION -->
+
+    <div class="candidate-card">
+
+        <div class="candidate-header">
+
+            <div class="candidate-info">
+
+                <h2 th:text="${candidate.name}">
+                    Candidate Name
+                </h2>
+
+                <p>
+                    📧
+                    <span th:text="${candidate.email}">
+                        candidate@email.com
+                    </span>
+                </p>
+
+                <p>
+                    📱
+                    <span th:text="${candidate.phone}">
+                        Phone
+                    </span>
+                </p>
+
+                <p>
+                    💼 Job:
+                    <strong th:text="${job.title}">
+                        Job Title
+                    </strong>
+                </p>
+
+            </div>
+
+
+            <!-- SCORE -->
+
+            <div class="score-box">
+
+                <div class="score"
+                     th:text="${analysis.atsScore}">
+                    0
+                </div>
+
+                <div class="score-label">
+                    ATS SCORE / 100
+                </div>
+
+                <div class="match-badge"
+                     th:text="${analysis.matchLevel}">
+                    HIGH
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="analysis-meta">
+
+            Analyzed At:
+            <span th:text="${analysis.analyzedAt}">
+                -
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- MATCHED SKILLS -->
+
+    <div class="section">
+
+        <h3>✅ Matched Skills</h3>
+
+        <div class="skill-list"
+             id="matchedSkills">
+
+            <!-- JavaScript will populate this -->
+
+        </div>
+
+    </div>
+
+
+    <!-- MISSING SKILLS -->
+
+    <div class="section">
+
+        <h3>❌ Missing Skills</h3>
+
+        <div class="skill-list"
+             id="missingSkills">
+
+            <!-- JavaScript will populate this -->
+
+        </div>
+
+    </div>
+
+
+    <!-- EXPERIENCE ANALYSIS -->
+
+    <div class="section">
+
+        <h3>💼 Experience Analysis</h3>
+
+        <div class="text-content"
+             th:text="${analysis.experienceAnalysis}">
+            Experience analysis
+        </div>
+
+    </div>
+
+
+    <!-- STRENGTHS -->
+
+    <div class="section">
+
+        <h3>💪 Strengths</h3>
+
+        <div class="skill-list"
+             id="strengths">
+
+            <!-- JavaScript will populate this -->
+
+        </div>
+
+    </div>
+
+
+    <!-- GAPS -->
+
+    <div class="section">
+
+        <h3>⚠️ Gaps</h3>
+
+        <div class="skill-list"
+             id="gaps">
+
+            <!-- JavaScript will populate this -->
+
+        </div>
+
+    </div>
+
+
+    <!-- RECOMMENDATION -->
+
+    <div class="section">
+
+        <h3>📋 Recruiter Recommendation</h3>
+
+        <div class="recommendation"
+             th:text="${analysis.recommendation}">
+
+            Recommendation
+
+        </div>
+
+    </div>
+
+
+    <a class="back-button"
+       th:href="@{/candidate-ranking(jobId=${job.id})}">
+
+        ← Back to Candidate Ranking
+
+    </a>
+
+</div>
+
+
+<script th:inline="javascript">
+
+    const matchedSkills =
+        /*[[${analysis.matchedSkills}]]*/ '[]';
+
+    const missingSkills =
+        /*[[${analysis.missingSkills}]]*/ '[]';
+
+    const strengths =
+        /*[[${analysis.strengths}]]*/ '[]';
+
+    const gaps =
+        /*[[${analysis.gaps}]]*/ '[]';
+
+
+    function parseArray(value) {
+
+        try {
+
+            if (!value) {
+                return [];
+            }
+
+            if (Array.isArray(value)) {
+                return value;
+            }
+
+            return JSON.parse(value);
+
+        } catch (error) {
+
+            console.error(
+                "Unable to parse AI array:",
+                value
+            );
+
+            return [];
+        }
+    }
+
+
+    function renderList(
+        elementId,
+        value,
+        className
+    ) {
+
+        const container =
+            document.getElementById(elementId);
+
+        const items =
+            parseArray(value);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+
+            const empty =
+                document.createElement("span");
+
+            empty.textContent =
+                "None identified.";
+
+            empty.style.color =
+                "#6b7280";
+
+            container.appendChild(empty);
+
+            return;
+        }
+
+        items.forEach(item => {
+
+            const span =
+                document.createElement("span");
+
+            span.className =
+                "skill " + className;
+
+            span.textContent =
+                item;
+
+            container.appendChild(span);
+
+        });
+
+    }
+
+
+    renderList(
+        "matchedSkills",
+        matchedSkills,
+        ""
+    );
+
+    renderList(
+        "missingSkills",
+        missingSkills,
+        "missing-skill"
+    );
+
+    renderList(
+        "strengths",
+        strengths,
+        "strength"
+    );
+
+    renderList(
+        "gaps",
+        gaps,
+        "gap"
+    );
+
+</script>
+
+</body>
+
+</html>

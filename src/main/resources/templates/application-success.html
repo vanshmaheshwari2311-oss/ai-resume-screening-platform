@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Application Submitted</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .check {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .job {
+            font-weight: bold;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 25px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <div class="check">
+            ✅
+        </div>
+
+        <h1>
+            Application Submitted!
+        </h1>
+
+        <p>
+            Thank you,
+            <strong th:text="${candidateName}">
+                Candidate
+            </strong>.
+        </p>
+
+        <p>
+            Your application for
+            <span class="job"
+                  th:text="${jobTitle}">
+                Job
+            </span>
+            has been successfully submitted.
+        </p>
+
+        <p>
+            Our recruitment team will review your application
+            and contact you if you are selected for the next stage.
+        </p>
+
+        <a href="/candidate/applications">
+            View My Applications
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

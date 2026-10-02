@@ -1,0 +1,2602 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Interview Assistant</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .navbar {
+            background: white;
+            padding: 18px 5%;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .dashboard {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .candidate-link {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* =====================================================
+           CONTAINER
+           ===================================================== */
+
+        .container {
+            width: 92%;
+            max-width: 1400px;
+            margin: 30px auto;
+        }
+
+        /* =====================================================
+           PAGE HEADER
+           ===================================================== */
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        /* =====================================================
+           CARDS
+           ===================================================== */
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+
+            box-shadow:
+                0 4px 18px rgba(0,0,0,0.07);
+
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 21px;
+        }
+
+        /* =====================================================
+           CANDIDATE PROFILE
+           ===================================================== */
+
+        .candidate-profile {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+
+            gap: 20px;
+            align-items: center;
+        }
+
+        .candidate-avatar {
+            width: 70px;
+            height: 70px;
+
+            border-radius: 50%;
+
+            background: #7c3aed;
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .candidate-details h2 {
+            margin: 0 0 7px;
+        }
+
+        .candidate-details p {
+            margin: 4px 0;
+            color: #64748b;
+        }
+
+        .resume-badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+
+            padding: 10px 15px;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           GENERATOR
+           ===================================================== */
+
+        .generator-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            background: white;
+        }
+
+        .generate-row {
+            margin-top: 22px;
+
+            display: flex;
+            justify-content: flex-end;
+
+            gap: 10px;
+        }
+
+        .button {
+            border: none;
+
+            padding: 12px 20px;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            font-size: 14px;
+        }
+
+        .generate-button {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .generate-button:hover {
+            background: #6d28d9;
+        }
+
+        .regenerate-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .regenerate-button:hover {
+            background: #1d4ed8;
+        }
+
+        .delete-button {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .delete-button:hover {
+            background: #fecaca;
+        }
+
+        .print-button {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .print-button:hover {
+            background: #e2e8f0;
+        }
+
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status {
+            display: none;
+
+            margin-top: 18px;
+
+            padding: 14px;
+
+            border-radius: 9px;
+
+            line-height: 1.5;
+        }
+
+        .status.loading {
+            display: block;
+
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .status.success {
+            display: block;
+
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.error {
+            display: block;
+
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* =====================================================
+           QUESTIONS HEADER
+           ===================================================== */
+
+        .questions-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .questions-header h2 {
+            margin: 0;
+        }
+
+        .question-count {
+            background: #f3e8ff;
+            color: #7c3aed;
+
+            padding: 8px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        /* =====================================================
+           QUESTION CARD
+           ===================================================== */
+
+        .question-card {
+            border: 1px solid #e5e7eb;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 16px;
+
+            background: #fafafa;
+        }
+
+        .question-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+
+            gap: 10px;
+        }
+
+        .question-number {
+            font-size: 16px;
+
+            font-weight: 800;
+
+            color: #7c3aed;
+        }
+
+        .badges {
+            display: flex;
+
+            gap: 7px;
+
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 5px 9px;
+
+            border-radius: 15px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            background: #e5e7eb;
+
+            color: #374151;
+        }
+
+        .technical {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .project {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .hr {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .resume {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .question-text {
+            font-size: 17px;
+
+            line-height: 1.6;
+
+            font-weight: 600;
+
+            margin-bottom: 15px;
+        }
+
+        .reason {
+            color: #64748b;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+
+            margin-bottom: 15px;
+        }
+
+        .reason strong {
+            color: #475569;
+        }
+
+        /* =====================================================
+           INTERVIEWER NOTES
+           ===================================================== */
+
+        .notes-label {
+            display: block;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            margin-bottom: 7px;
+
+            color: #475569;
+        }
+
+        .interviewer-notes {
+            width: 100%;
+
+            min-height: 75px;
+
+            resize: vertical;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            padding: 10px;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 13px;
+
+            outline: none;
+        }
+
+        .interviewer-notes:focus {
+            border-color: #7c3aed;
+
+            box-shadow:
+                0 0 0 2px rgba(124,58,237,0.1);
+        }
+
+        .question-actions {
+            margin-top: 10px;
+
+            display: flex;
+
+            justify-content: flex-end;
+        }
+
+        .copy-button {
+            border: none;
+
+            background: #f1f5f9;
+
+            color: #475569;
+
+            padding: 7px 11px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            font-weight: 600;
+        }
+
+        .copy-button:hover {
+            background: #e2e8f0;
+        }
+
+        /* =====================================================
+           EMPTY
+           ===================================================== */
+
+        .empty {
+            text-align: center;
+
+            padding: 55px 20px;
+
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 50px;
+
+            margin-bottom: 15px;
+        }
+
+        /* =====================================================
+           PRINT
+           ===================================================== */
+
+        @media print {
+
+            body {
+                background: white;
+            }
+
+            .navbar,
+            .generator-card,
+            .question-actions,
+            .status {
+                display: none !important;
+            }
+
+            .container {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .interviewer-notes {
+                border: 1px solid #999;
+            }
+
+        }
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1000px) {
+
+            .generator-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .candidate-profile {
+                grid-template-columns: 70px 1fr;
+            }
+
+            .resume-badge {
+                grid-column: 1 / -1;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .generator-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-profile {
+                grid-template-columns: 1fr;
+            }
+
+            .candidate-avatar {
+                margin: auto;
+            }
+
+            .candidate-details {
+                text-align: center;
+            }
+
+            .questions-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .generate-row {
+                flex-direction: column;
+            }
+
+            .generate-row .button {
+                width: 100%;
+            }
+
+        }
+
+    
+
+    /* =========================================================
+       INTERVIEW EVALUATION
+       ========================================================= */
+
+    .evaluation-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .evaluation-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: #334155;
+        margin-bottom: 15px;
+    }
+
+    .answer-label,
+    .feedback-label,
+    .rating-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 7px;
+    }
+
+    .candidate-answer,
+    .interviewer-feedback {
+        display: block;
+        width: 100%;
+        min-height: 90px;
+        resize: vertical;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 11px;
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+        outline: none;
+        margin: 0 0 14px 0;
+        background: white;
+    }
+
+    .candidate-answer:focus,
+    .interviewer-feedback:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37,99,235,0.10);
+    }
+
+    .rating-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .rating-button {
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #475569;
+        width: 40px;
+        height: 36px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .rating-button:hover {
+        background: #fef3c7;
+        border-color: #f59e0b;
+        color: #92400e;
+    }
+
+    .rating-button.selected {
+        background: #f59e0b;
+        border-color: #f59e0b;
+        color: white;
+    }
+
+    .evaluation-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .save-evaluation-button {
+        border: none;
+        background: #16a34a;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .save-evaluation-button:hover {
+        background: #15803d;
+    }
+
+    .save-evaluation-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .evaluation-status {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .evaluation-status.saved {
+        color: #16a34a;
+    }
+
+    .evaluation-status.error {
+        color: #dc2626;
+    }
+
+
+
+    /* =========================================================
+       AI INTERVIEW SUMMARY
+       ========================================================= */
+
+    .ai-summary-card {
+        margin-top: 24px;
+        border: 1px solid #dbeafe;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .summary-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .summary-title {
+        margin: 0;
+        color: #1e3a8a;
+    }
+
+    .summary-subtitle {
+        margin: 5px 0 0;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .generate-summary-button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        padding: 11px 17px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .generate-summary-button:hover {
+        background: #1d4ed8;
+    }
+
+    .generate-summary-button:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+    }
+
+    .summary-status {
+        min-height: 20px;
+        margin: 8px 0 15px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .summary-status.success { color: #15803d; }
+    .summary-status.error { color: #dc2626; }
+    .summary-status.loading { color: #2563eb; }
+
+    .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .summary-stat {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .summary-stat-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #1e40af;
+    }
+
+    .summary-stat-label {
+        margin-top: 4px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .summary-section {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        padding: 15px;
+    }
+
+    .summary-section.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .summary-section h3 {
+        margin: 0 0 9px;
+        font-size: 14px;
+        color: #334155;
+    }
+
+    .summary-section p,
+    .summary-section pre {
+        margin: 0;
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        font-family: Arial, sans-serif;
+    }
+
+    .summary-list {
+        margin: 0;
+        padding-left: 20px;
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    .summary-empty {
+        color: #94a3b8;
+        font-size: 13px;
+        padding: 8px 0;
+    }
+
+    @media (max-width: 700px) {
+        .summary-stats,
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-section.full-width {
+            grid-column: auto;
+        }
+    }
+
+    @media print {
+        .ai-summary-card {
+            break-inside: avoid;
+        }
+
+        .generate-summary-button,
+        .summary-status {
+            display: none !important;
+        }
+    }
+
+
+
+    .notes-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        margin-bottom: 14px;
+    }
+
+    .save-notes-button {
+        border: none;
+        background: #2563eb;
+        color: white;
+        padding: 9px 14px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .save-notes-button:hover {
+        background: #1d4ed8;
+    }
+
+    .save-notes-button:disabled {
+        opacity: .6;
+        cursor: not-allowed;
+    }
+
+    .notes-status {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .notes-status.saved { color: #16a34a; }
+    .notes-status.error { color: #dc2626; }
+
+
+
+    @media print {
+        .notes-actions,
+        .evaluation-actions {
+            display: none !important;
+        }
+    }
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     NAVBAR
+     ========================================================= -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 AI Interview Assistant
+    </h1>
+
+    <div class="nav-actions">
+
+        <a href="/dashboard"
+           class="nav-button dashboard">
+            Dashboard
+        </a>
+
+        <a href="/candidate-management"
+           class="nav-button candidate-link">
+            Candidates
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <h2>
+            AI Interview Assistant
+        </h2>
+
+        <p>
+            Generate resume-based interview questions
+            for HR and interviewers using AI.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         CANDIDATE PROFILE
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="candidate-profile">
+
+            <div class="candidate-avatar"
+                 id="candidateAvatar">
+
+                👤
+
+            </div>
+
+
+            <div class="candidate-details">
+
+                <h2 id="candidateName">
+
+                    <span th:if="${candidate != null}"
+                          th:text="${candidate.name}">
+                        Candidate
+                    </span>
+
+                    <span th:unless="${candidate != null}">
+                        Select Candidate
+                    </span>
+
+                </h2>
+
+
+                <p id="candidateEmail"
+                   th:if="${candidate != null}"
+                   th:text="${candidate.email}">
+                    email
+                </p>
+
+
+                <p th:if="${candidate != null}">
+
+                    📄
+
+                    <strong>Resume:</strong>
+
+                    <span th:text="${candidate.resumeFileName}">
+                        Resume
+                    </span>
+
+                </p>
+
+            </div>
+
+
+            <div class="resume-badge"
+                 th:if="${candidate != null}">
+
+                📄 Resume Loaded
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GENERATOR
+         ===================================================== -->
+
+    <div class="card generator-card">
+
+        <h2 class="card-title">
+            🤖 Interview Question Generator
+        </h2>
+
+
+        <div class="generator-grid">
+
+
+            <!-- CANDIDATE -->
+
+            <div class="form-group">
+
+                <label for="candidateSelect">
+                    Candidate
+                </label>
+
+                <select id="candidateSelect"
+                        onchange="candidateChanged()">
+
+                    <option value="">
+                        -- Select Candidate --
+                    </option>
+
+                    <option th:each="c : ${candidates}"
+                            th:value="${c.id}"
+                            th:text="${c.name + ' - ' + c.email}"
+                            th:selected="${candidate != null and candidate.id == c.id}">
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- QUESTION TYPE -->
+
+            <div class="form-group">
+
+                <label for="questionType">
+                    Question Type
+                </label>
+
+                <select id="questionType">
+
+                    <option value="MIXED">
+                        Mixed
+                    </option>
+
+                    <option value="RESUME_BASED">
+                        Resume Based
+                    </option>
+
+                    <option value="TECHNICAL">
+                        Technical
+                    </option>
+
+                    <option value="PROJECT_BASED">
+                        Project Based
+                    </option>
+
+                    <option value="HR_BEHAVIORAL">
+                        HR / Behavioral
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DIFFICULTY -->
+
+            <div class="form-group">
+
+                <label for="difficulty">
+                    Difficulty
+                </label>
+
+                <select id="difficulty">
+
+                    <option value="EASY">
+                        Easy
+                    </option>
+
+                    <option value="MEDIUM"
+                            selected>
+                        Medium
+                    </option>
+
+                    <option value="HARD">
+                        Hard
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- NUMBER -->
+
+            <div class="form-group">
+
+                <label for="numberOfQuestions">
+                    Number of Questions
+                </label>
+
+                <select id="numberOfQuestions">
+
+                    <option value="5">
+                        5 Questions
+                    </option>
+
+                    <option value="10"
+                            selected>
+                        10 Questions
+                    </option>
+
+                    <option value="15">
+                        15 Questions
+                    </option>
+
+                    <option value="20">
+                        20 Questions
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="generate-row">
+
+            <button type="button"
+                    class="button print-button"
+                    onclick="window.print()">
+
+                🖨 Print Interview Sheet
+
+            </button>
+
+
+            <button type="button"
+                    class="button delete-button"
+                    onclick="deleteQuestions()">
+
+                🗑 Clear Questions
+
+            </button>
+
+
+            <button type="button"
+                    class="button regenerate-button"
+                    onclick="generateQuestions()">
+
+                🔄 Generate / Regenerate
+
+            </button>
+
+        </div>
+
+
+        <div id="status"
+             class="status">
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUESTIONS
+         ===================================================== -->
+
+    <div class="card">
+
+        <div class="questions-header">
+
+            <h2>
+                Generated Interview Questions
+            </h2>
+
+            <span id="questionCount"
+                  class="question-count">
+
+                0 Questions
+
+            </span>
+
+        </div>
+
+
+        <div id="questionsContainer">
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    🤖
+                </div>
+
+                <h3>
+                    No Interview Questions Yet
+                </h3>
+
+                <p>
+                    Select a candidate and generate
+                    AI-powered interview questions.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         AI INTERVIEW SUMMARY
+         ===================================================== -->
+
+    <div class="card ai-summary-card">
+
+        <div class="summary-header">
+
+            <div>
+                <h2 class="summary-title">
+                    🤖 AI Interview Summary
+                </h2>
+                <p class="summary-subtitle">
+                    Analyze the recorded answers, ratings, interviewer feedback and notes.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="generateSummaryButton"
+                class="generate-summary-button"
+                onclick="generateAISummary()">
+                ✨ Generate AI Summary
+            </button>
+
+        </div>
+
+        <div id="summaryStatus" class="summary-status"></div>
+
+        <div id="summaryContent">
+            <div class="summary-empty">
+                Select a candidate and generate the AI interview summary after at least one question has been evaluated.
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       CANDIDATE CHANGE
+       ========================================================= */
+
+    function candidateChanged() {
+
+        const candidateId =
+            document.getElementById(
+                "candidateSelect"
+            ).value;
+
+        if (!candidateId) {
+
+            window.location.href =
+                "/ai-interview-questions";
+
+            return;
+        }
+
+        window.location.href =
+            "/ai-interview-questions/"
+            + candidateId;
+    }
+
+
+    /* =========================================================
+       GENERATE QUESTIONS
+       ========================================================= */
+
+    async function generateQuestions() {
+
+        const candidateId =
+            document.getElementById(
+                "candidateSelect"
+            ).value;
+
+        const questionType =
+            document.getElementById(
+                "questionType"
+            ).value;
+
+        const difficulty =
+            document.getElementById(
+                "difficulty"
+            ).value;
+
+        const numberOfQuestions =
+            document.getElementById(
+                "numberOfQuestions"
+            ).value;
+
+        if (!candidateId) {
+
+            showStatus(
+                "Please select a candidate first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        showStatus(
+            "⏳ Gemini is analyzing the candidate resume and generating interview questions...",
+            "loading"
+        );
+
+
+        try {
+
+            const url =
+                "/api/interview-questions/generate/"
+                + candidateId
+                + "?questionType="
+                + encodeURIComponent(questionType)
+                + "&difficulty="
+                + encodeURIComponent(difficulty)
+                + "&numberOfQuestions="
+                + numberOfQuestions;
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "POST"
+                    }
+                );
+
+
+            const text =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    text ||
+                    "Interview question generation failed."
+                );
+
+            }
+
+
+            const questions =
+                JSON.parse(text);
+
+
+            displayQuestions(
+                questions
+            );
+
+
+            showStatus(
+                "✅ "
+                + questions.length
+                + " interview questions generated successfully.",
+                "success"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            showStatus(
+                error.message ||
+                "Failed to generate interview questions.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       LOAD EXISTING QUESTIONS
+       ========================================================= */
+
+    async function loadExistingQuestions() {
+
+        const candidateId =
+            document.getElementById(
+                "candidateSelect"
+            ).value;
+
+
+        if (!candidateId) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/interview-questions/"
+                    + candidateId
+                );
+
+
+            if (!response.ok) {
+                return;
+            }
+
+
+            const questions =
+                await response.json();
+
+
+            if (
+                questions &&
+                questions.length > 0
+            ) {
+
+                displayQuestions(
+                    questions
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Could not load existing questions:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       DISPLAY QUESTIONS
+       ========================================================= */
+
+    function displayQuestions(
+        questions
+    ) {
+
+        const container =
+            document.getElementById(
+                "questionsContainer"
+            );
+
+
+        const count =
+            document.getElementById(
+                "questionCount"
+            );
+
+
+        count.innerText =
+            questions.length
+            + " Questions";
+
+
+        if (
+            !questions ||
+            questions.length === 0
+        ) {
+
+            container.innerHTML = `
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        🤖
+                    </div>
+
+                    <h3>
+                        No Interview Questions Yet
+                    </h3>
+
+                    <p>
+                        Generate questions using the candidate resume.
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        questions.forEach(
+            function(question, index) {
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "question-card";
+
+
+                const typeClass =
+                    getTypeClass(
+                        question.questionType
+                    );
+
+
+                card.innerHTML = `
+
+                    <div class="question-header">
+
+                        <div class="question-number">
+
+                            Question ${index + 1}
+
+                        </div>
+
+                        <div class="badges">
+
+                            <span class="badge ${typeClass}">
+                                ${escapeHtml(
+                                    question.questionType
+                                )}
+                            </span>
+
+                            <span class="badge">
+                                ${escapeHtml(
+                                    question.difficulty
+                                )}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="question-text">
+
+                        ${escapeHtml(
+                            question.question
+                        )}
+
+                    </div>
+
+
+                    <div class="reason">
+
+                        <strong>
+                            Why this question:
+                        </strong>
+
+                        ${escapeHtml(
+                            question.reason
+                        )}
+
+                    </div>
+
+
+                    <label class="notes-label">
+
+                        📝 Interviewer Notes
+
+                    </label>
+
+
+                    <textarea
+                        class="interviewer-notes"
+                        data-question-id="${question.id}"
+                        placeholder="Write notes during the interview...">${escapeHtml(question.interviewerNotes || "")}</textarea>
+
+                    <div class="notes-actions">
+
+                        <button
+                            type="button"
+                            class="save-notes-button"
+                            onclick="saveNotes(this)">
+                            💾 Save Notes
+                        </button>
+
+                        <span class="notes-status"></span>
+
+                    </div>
+
+
+                    <div class="evaluation-section">
+
+                        <div class="evaluation-title">
+                            🎤 Interview Evaluation
+                        </div>
+
+                        <label class="answer-label">
+                            Candidate Answer
+                        </label>
+
+                        <textarea
+                            class="candidate-answer"
+                            placeholder="Enter the candidate's answer..."
+                        ></textarea>
+
+                        <label class="rating-label">
+                            ⭐ Rating
+                        </label>
+
+                        <div class="rating-group">
+
+                            <button type="button"
+                                    class="rating-button"
+                                    data-rating="1"
+                                    onclick="selectRating(this)">
+                                1
+                            </button>
+
+                            <button type="button"
+                                    class="rating-button"
+                                    data-rating="2"
+                                    onclick="selectRating(this)">
+                                2
+                            </button>
+
+                            <button type="button"
+                                    class="rating-button"
+                                    data-rating="3"
+                                    onclick="selectRating(this)">
+                                3
+                            </button>
+
+                            <button type="button"
+                                    class="rating-button"
+                                    data-rating="4"
+                                    onclick="selectRating(this)">
+                                4
+                            </button>
+
+                            <button type="button"
+                                    class="rating-button"
+                                    data-rating="5"
+                                    onclick="selectRating(this)">
+                                5
+                            </button>
+
+                        </div>
+
+                        <label class="feedback-label">
+                            Interviewer Feedback
+                        </label>
+
+                        <textarea
+                            class="interviewer-feedback"
+                            placeholder="Enter interviewer feedback..."
+                        ></textarea>
+
+                        <div class="evaluation-actions">
+
+                            <button
+                                type="button"
+                                class="save-evaluation-button"
+                                onclick="saveEvaluation(this)">
+
+                                💾 Save Evaluation
+
+                            </button>
+
+                            <span class="evaluation-status"></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="question-actions">
+
+                        <button
+                            class="copy-button"
+                            onclick="copyQuestion(this)">
+
+                            📋 Copy Question
+
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                container.appendChild(
+                    card
+                );
+
+                loadEvaluationForCard(
+                    card,
+                    question.id
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       QUESTION TYPE STYLE
+       ========================================================= */
+
+    function getTypeClass(
+        type
+    ) {
+
+        if (!type) {
+            return "";
+        }
+
+
+        const normalized =
+            type.toUpperCase();
+
+
+        if (
+            normalized === "TECHNICAL"
+        ) {
+            return "technical";
+        }
+
+
+        if (
+            normalized === "PROJECT_BASED"
+        ) {
+            return "project";
+        }
+
+
+        if (
+            normalized === "HR_BEHAVIORAL"
+        ) {
+            return "hr";
+        }
+
+
+        if (
+            normalized === "RESUME_BASED"
+        ) {
+            return "resume";
+        }
+
+
+        return "";
+
+    }
+
+
+    /* =========================================================
+       SELECT RATING
+       ========================================================= */
+
+    function selectRating(button) {
+
+        const group =
+            button.closest(".rating-group");
+
+        const buttons =
+            group.querySelectorAll(".rating-button");
+
+        buttons.forEach(
+            function(item) {
+                item.classList.remove("selected");
+            }
+        );
+
+        button.classList.add("selected");
+
+        group.dataset.rating =
+            button.dataset.rating;
+    }
+
+
+    /* =========================================================
+       SAVE INTERVIEW EVALUATION
+       ========================================================= */
+
+    async function saveEvaluation(button) {
+
+        const card =
+            button.closest(".question-card");
+
+        const questionId =
+            card.querySelector(
+                ".interviewer-notes"
+            ).dataset.questionId;
+
+        const answer =
+            card.querySelector(
+                ".candidate-answer"
+            ).value;
+
+        const feedback =
+            card.querySelector(
+                ".interviewer-feedback"
+            ).value;
+
+        const ratingGroup =
+            card.querySelector(
+                ".rating-group"
+            );
+
+        const rating =
+            ratingGroup.dataset.rating;
+
+        const status =
+            card.querySelector(
+                ".evaluation-status"
+            );
+
+        if (!rating) {
+
+            status.innerText =
+                "✕ Please select a rating.";
+
+            status.className =
+                "evaluation-status error";
+
+            return;
+        }
+
+        button.disabled = true;
+        button.innerText = "Saving...";
+
+        try {
+
+            const url =
+                "/api/interview-evaluation/"
+                + questionId
+                + "?candidateAnswer="
+                + encodeURIComponent(answer)
+                + "&rating="
+                + encodeURIComponent(rating)
+                + "&interviewerFeedback="
+                + encodeURIComponent(feedback);
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: "POST"
+                    }
+                );
+
+            const result =
+                await response.text();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result ||
+                    "Failed to save evaluation."
+                );
+            }
+
+            status.innerText =
+                "✓ Evaluation Saved";
+
+            status.className =
+                "evaluation-status saved";
+
+            button.innerText =
+                "💾 Save Evaluation";
+
+            setTimeout(
+                function() {
+                    status.innerText = "";
+                },
+                2500
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            status.innerText =
+                "✕ Failed to save";
+
+            status.className =
+                "evaluation-status error";
+
+            button.innerText =
+                "💾 Save Evaluation";
+
+            showStatus(
+                error.message ||
+                "Failed to save interview evaluation.",
+                "error"
+            );
+
+        } finally {
+
+            button.disabled = false;
+        }
+    }
+
+
+    /* =========================================================
+       LOAD SAVED EVALUATION
+       ========================================================= */
+
+    async function loadEvaluationForCard(card, questionId) {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/interview-evaluation/question/"
+                    + questionId
+                );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const evaluation =
+                await response.json();
+
+            if (!evaluation) {
+                return;
+            }
+
+            const answer =
+                card.querySelector(
+                    ".candidate-answer"
+                );
+
+            const feedback =
+                card.querySelector(
+                    ".interviewer-feedback"
+                );
+
+            const ratingGroup =
+                card.querySelector(
+                    ".rating-group"
+                );
+
+            if (answer) {
+                answer.value =
+                    evaluation.candidateAnswer || "";
+            }
+
+            if (feedback) {
+                feedback.value =
+                    evaluation.interviewerFeedback || "";
+            }
+
+            if (ratingGroup &&
+                evaluation.rating) {
+
+                ratingGroup.dataset.rating =
+                    evaluation.rating;
+
+                const ratingButton =
+                    ratingGroup.querySelector(
+                        '[data-rating="' +
+                        evaluation.rating +
+                        '"]'
+                    );
+
+                if (ratingButton) {
+                    ratingButton.classList.add("selected");
+                }
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Could not load evaluation:",
+                error
+            );
+        }
+    }
+
+
+    /* =========================================================
+       COPY QUESTION
+       ========================================================= */
+
+    async function copyQuestion(
+        button
+    ) {
+
+        const card =
+            button.closest(
+                ".question-card"
+            );
+
+
+        const question =
+            card.querySelector(
+                ".question-text"
+            ).innerText;
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                question
+            );
+
+
+            button.innerText =
+                "✅ Copied";
+
+
+            setTimeout(
+                function() {
+
+                    button.innerText =
+                        "📋 Copy Question";
+
+                },
+                1500
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       DELETE QUESTIONS
+       ========================================================= */
+
+    async function deleteQuestions() {
+
+        const candidateId =
+            document.getElementById(
+                "candidateSelect"
+            ).value;
+
+
+        if (!candidateId) {
+
+            showStatus(
+                "Please select a candidate first.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                "Delete all generated interview questions for this candidate?"
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/interview-questions/"
+                    + candidateId,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            const result =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result ||
+                    "Failed to delete questions."
+                );
+
+            }
+
+
+            document.getElementById(
+                "questionsContainer"
+            ).innerHTML = `
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        🗑
+                    </div>
+
+                    <h3>
+                        Questions Cleared
+                    </h3>
+
+                    <p>
+                        You can generate a new interview set.
+                    </p>
+
+                </div>
+
+            `;
+
+
+            document.getElementById(
+                "questionCount"
+            ).innerText =
+                "0 Questions";
+
+
+            showStatus(
+                "Interview questions deleted successfully.",
+                "success"
+            );
+
+
+        } catch (error) {
+
+            showStatus(
+                error.message ||
+                "Failed to delete questions.",
+                "error"
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SAVE INTERVIEWER NOTES
+       ========================================================= */
+
+    async function saveNotes(button) {
+
+        const card = button.closest(".question-card");
+        const notesField = card.querySelector(".interviewer-notes");
+        const questionId = notesField.dataset.questionId;
+        const status = card.querySelector(".notes-status");
+
+        button.disabled = true;
+        button.innerText = "Saving...";
+
+        try {
+
+            const response = await fetch(
+                "/api/interview-questions/"
+                + questionId
+                + "/notes?notes="
+                + encodeURIComponent(notesField.value),
+                { method: "PUT" }
+            );
+
+            const result = await response.text();
+
+            if (!response.ok) {
+                throw new Error(result || "Failed to save notes.");
+            }
+
+            status.innerText = "✓ Notes Saved";
+            status.className = "notes-status saved";
+            button.innerText = "💾 Save Notes";
+
+            setTimeout(function() {
+                status.innerText = "";
+            }, 2500);
+
+        } catch (error) {
+
+            console.error(error);
+            status.innerText = "✕ Failed to save";
+            status.className = "notes-status error";
+            button.innerText = "💾 Save Notes";
+
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+
+    /* =========================================================
+       GENERATE AI INTERVIEW SUMMARY
+       ========================================================= */
+
+    async function generateAISummary() {
+
+        const candidateId =
+            document.getElementById("candidateSelect").value;
+
+        const button =
+            document.getElementById("generateSummaryButton");
+
+        const status =
+            document.getElementById("summaryStatus");
+
+        if (!candidateId) {
+            status.innerText = "Please select a candidate first.";
+            status.className = "summary-status error";
+            return;
+        }
+
+        button.disabled = true;
+        button.innerText = "⏳ Generating AI Summary...";
+        status.innerText =
+            "Gemini is analyzing the recorded interview...";
+        status.className = "summary-status loading";
+
+        try {
+
+            const response = await fetch(
+                "/api/interview-summary/generate/" + candidateId,
+                { method: "POST" }
+            );
+
+            const text = await response.text();
+
+            if (!response.ok) {
+                throw new Error(
+                    text || "Failed to generate AI interview summary."
+                );
+            }
+
+            const summary = JSON.parse(text);
+
+            displayAISummary(summary);
+
+            status.innerText = "✓ AI Interview Summary Generated";
+            status.className = "summary-status success";
+
+        } catch (error) {
+
+            console.error(error);
+            status.innerText =
+                error.message || "Failed to generate AI interview summary.";
+            status.className = "summary-status error";
+
+        } finally {
+            button.disabled = false;
+            button.innerText = "✨ Generate AI Summary";
+        }
+    }
+
+
+    /* =========================================================
+       LOAD SAVED AI SUMMARY
+       ========================================================= */
+
+    async function loadAISummary() {
+
+        const candidateId =
+            document.getElementById("candidateSelect").value;
+
+        if (!candidateId) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                "/api/interview-summary/" + candidateId
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const summary = await response.json();
+            displayAISummary(summary);
+
+        } catch (error) {
+            console.error("Failed to load AI summary:", error);
+        }
+    }
+
+
+    /* =========================================================
+       DISPLAY AI SUMMARY
+       ========================================================= */
+
+    function displayAISummary(summary) {
+
+        const container =
+            document.getElementById("summaryContent");
+
+        const strengths = textToList(summary.strengths);
+        const areas = textToList(summary.areasToClarify);
+        const followUps = textToList(summary.followUpQuestions);
+
+        container.innerHTML = `
+
+            <div class="summary-stats">
+
+                <div class="summary-stat">
+                    <div class="summary-stat-value">
+                        ${escapeHtml(summary.averageRating ?? "0.00")} / 5
+                    </div>
+                    <div class="summary-stat-label">Average Rating</div>
+                </div>
+
+                <div class="summary-stat">
+                    <div class="summary-stat-value">
+                        ${escapeHtml(summary.evaluatedQuestions ?? 0)}
+                    </div>
+                    <div class="summary-stat-label">Evaluated Questions</div>
+                </div>
+
+                <div class="summary-stat">
+                    <div class="summary-stat-value">
+                        ${escapeHtml(summary.totalQuestions ?? 0)}
+                    </div>
+                    <div class="summary-stat-label">Total Questions</div>
+                </div>
+
+            </div>
+
+            <div class="summary-grid">
+
+                ${summarySection("💪 Strengths", strengths)}
+                ${summarySection("🔎 Areas to Clarify", areas)}
+
+                ${summaryTextSection(
+                    "💻 Technical Summary",
+                    summary.technicalSummary
+                )}
+
+                ${summaryTextSection(
+                    "🗣️ Response Summary",
+                    summary.responseSummary
+                )}
+
+                ${summarySection(
+                    "❓ AI Follow-up Questions",
+                    followUps
+                )}
+
+                ${summaryTextSection(
+                    "📋 Overall Interview Summary",
+                    summary.overallSummary,
+                    true
+                )}
+
+            </div>
+        `;
+    }
+
+
+    function summarySection(title, items) {
+
+        if (!items.length) {
+            return `
+                <div class="summary-section">
+                    <h3>${title}</h3>
+                    <div class="summary-empty">No recorded information.</div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="summary-section">
+                <h3>${title}</h3>
+                <ul class="summary-list">
+                    ${items.map(function(item) {
+                        return `<li>${escapeHtml(item)}</li>`;
+                    }).join("")}
+                </ul>
+            </div>
+        `;
+    }
+
+
+    function summaryTextSection(title, value, fullWidth) {
+
+        return `
+            <div class="summary-section ${fullWidth ? "full-width" : ""}">
+                <h3>${title}</h3>
+                <p>${escapeHtml(value || "No recorded information.")}</p>
+            </div>
+        `;
+    }
+
+
+    function textToList(value) {
+
+        if (!value) {
+            return [];
+        }
+
+        return String(value)
+            .split("\n")
+            .map(function(item) {
+                return item.replace(/^\s*[•-]\s*/, "").trim();
+            })
+            .filter(function(item) {
+                return item.length > 0;
+            });
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    function showStatus(
+        message,
+        type
+    ) {
+
+        const status =
+            document.getElementById(
+                "status"
+            );
+
+
+        status.className =
+            "status "
+            + type;
+
+
+        status.innerText =
+            message;
+
+    }
+
+
+    /* =========================================================
+       HTML ESCAPE
+       ========================================================= */
+
+    function escapeHtml(
+        value
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =========================================================
+       PAGE LOAD
+       ========================================================= */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            loadExistingQuestions();
+            loadAISummary();
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

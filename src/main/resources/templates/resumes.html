@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Resume Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .navbar {
+            background: #111827;
+            color: white;
+
+            padding: 20px 40px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .back {
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 11px 20px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+        .back:hover {
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           MAIN CONTAINER
+           ===================================================== */
+
+        .container {
+            width: 94%;
+            max-width: 1500px;
+
+            margin: 35px auto;
+        }
+
+        /* =====================================================
+           CARD
+           ===================================================== */
+
+        .card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.08);
+
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 34px;
+            margin: 0 0 10px 0;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        /* =====================================================
+           STAT CARDS
+           ===================================================== */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+        }
+
+        .stat {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-title {
+            color: #64748b;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            margin-top: 10px;
+
+            font-size: 34px;
+
+            font-weight: bold;
+
+            color: #2563eb;
+        }
+
+        /* =====================================================
+           FORM
+           ===================================================== */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 8px;
+
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+
+            padding: 13px;
+
+            border:
+                1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+
+            min-height: 100px;
+        }
+
+        input:focus,
+        textarea:focus {
+
+            outline: none;
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.15);
+        }
+
+        .upload-btn {
+
+            margin-top: 20px;
+
+            background: #2563eb;
+
+            color: white;
+
+            border: none;
+
+            padding: 14px 25px;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .upload-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           TABLE
+           ===================================================== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1100px;
+        }
+
+        th,
+        td {
+
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            vertical-align: middle;
+        }
+
+        th {
+
+            background: #111827;
+
+            color: white;
+
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f9fafb;
+        }
+
+        /* =====================================================
+           CANDIDATE
+           ===================================================== */
+
+        .candidate-name {
+            font-weight: bold;
+
+            font-size: 16px;
+        }
+
+        .candidate-email {
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            margin-top: 4px;
+        }
+
+        /* =====================================================
+           SKILLS
+           ===================================================== */
+
+        .skill {
+
+            display: inline-block;
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            margin: 2px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           RESUME
+           ===================================================== */
+
+        .resume-name {
+
+            max-width: 220px;
+
+            word-break: break-word;
+
+            color: #475569;
+
+            font-size: 13px;
+        }
+
+        .uploaded {
+
+            display: inline-block;
+
+            margin-top: 6px;
+
+            background: #dcfce7;
+
+            color: #15803d;
+
+            padding: 4px 8px;
+
+            border-radius: 15px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 7px 12px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+        .pending {
+
+            background: #fef3c7;
+
+            color: #a16207;
+        }
+
+        .shortlisted {
+
+            background: #dcfce7;
+
+            color: #15803d;
+        }
+
+        .rejected {
+
+            background: #fee2e2;
+
+            color: #dc2626;
+        }
+
+        /* =====================================================
+           ACTION BUTTONS
+           ===================================================== */
+
+        .actions {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+        }
+
+        .action-btn {
+
+            display: inline-block;
+
+            text-decoration: none;
+
+            border: none;
+
+            padding: 8px 11px;
+
+            border-radius: 7px;
+
+            color: white;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .view-btn {
+            background: #2563eb;
+        }
+
+        .view-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .download-btn {
+            background: #7c3aed;
+        }
+
+        .download-btn:hover {
+            background: #6d28d9;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        .delete-form {
+            display: inline;
+        }
+
+        /* =====================================================
+           EMPTY
+           ===================================================== */
+
+        .empty {
+
+            text-align: center;
+
+            padding: 40px;
+
+            color: #64748b;
+        }
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
+
+        @media(max-width: 800px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+
+                grid-column: auto;
+            }
+
+            .navbar {
+
+                padding: 18px 20px;
+            }
+
+            .container {
+
+                width: 92%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+
+<div class="navbar">
+
+    <h2>
+        🤖 AI Resume Screening
+    </h2>
+
+    <a
+            class="back"
+            href="/dashboard">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+
+<div class="container">
+
+
+    <!-- ========================================================
+         PAGE HEADER
+         ======================================================== -->
+
+    <div class="card">
+
+        <h1 class="page-title">
+            📄 Resume Management
+        </h1>
+
+        <p class="subtitle">
+
+            Upload candidate resumes, extract resume text
+            and manage candidates in the screening system.
+
+        </p>
+
+    </div>
+
+
+    <!-- ========================================================
+         STATISTICS
+         ======================================================== -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="stat-title">
+                Total Candidates
+            </div>
+
+            <div
+                    class="stat-value"
+                    th:text="${#lists.size(candidates)}">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                Resumes Uploaded
+            </div>
+
+            <div
+                    class="stat-value"
+                    th:text="${#lists.size(candidates)}">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-title">
+                Ready For Screening
+            </div>
+
+            <div
+                    class="stat-value"
+                    th:text="${#lists.size(candidates)}">
+
+                0
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         ADD CANDIDATE
+         ======================================================== -->
+
+    <div class="card">
+
+        <h1>
+            ➕ Add Candidate
+        </h1>
+
+        <p class="subtitle">
+
+            Enter candidate information and upload
+            a PDF or DOC/DOCX resume.
+
+        </p>
+
+
+        <form
+                action="/resumes/save"
+                method="post"
+                enctype="multipart/form-data">
+
+
+            <div class="form-grid">
+
+
+                <!-- NAME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Candidate Name
+                    </label>
+
+                    <input
+                            type="text"
+                            name="name"
+                            placeholder="Enter candidate name"
+                            required>
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                            type="email"
+                            name="email"
+                            placeholder="candidate@email.com"
+                            required>
+
+                </div>
+
+
+                <!-- PHONE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Phone
+                    </label>
+
+                    <input
+                            type="text"
+                            name="phone"
+                            placeholder="Enter phone number"
+                            required>
+
+                </div>
+
+
+                <!-- RESUME -->
+
+                <div class="form-group">
+
+                    <label>
+                        Resume
+                    </label>
+
+                    <input
+                            type="file"
+                            name="resume"
+                            accept=".pdf,.doc,.docx"
+                            required>
+
+                </div>
+
+
+                <!-- SKILLS -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Skills
+                    </label>
+
+                    <textarea
+                            name="skills"
+                            placeholder="Java, Spring Boot, MySQL, HTML, CSS..."
+                            required></textarea>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                    type="submit"
+                    class="upload-btn">
+
+                📤 Upload & Save Candidate
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================================================
+         CANDIDATE LIST
+         ======================================================== -->
+
+    <div class="card">
+
+        <h1>
+            👥 Registered Candidates
+        </h1>
+
+        <p class="subtitle">
+
+            Candidates currently registered in the system.
+
+        </p>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        #
+                    </th>
+
+                    <th>
+                        Candidate
+                    </th>
+
+                    <th>
+                        Phone
+                    </th>
+
+                    <th>
+                        Skills
+                    </th>
+
+                    <th>
+                        Resume
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                <!-- =================================================
+                     CANDIDATE ROW
+                     ================================================= -->
+
+                <tr
+                        th:each="candidate, stat : ${candidates}">
+
+
+                    <!-- NUMBER -->
+
+                    <td
+                            th:text="${stat.count}">
+
+                        1
+
+                    </td>
+
+
+                    <!-- CANDIDATE -->
+
+                    <td>
+
+                        <div
+                                class="candidate-name"
+                                th:text="${candidate.name}">
+
+                            Candidate
+
+                        </div>
+
+                        <div
+                                class="candidate-email"
+                                th:text="${candidate.email}">
+
+                            email@example.com
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- PHONE -->
+
+                    <td
+                            th:text="${candidate.phone}">
+
+                        0000000000
+
+                    </td>
+
+
+                    <!-- SKILLS -->
+
+                    <td>
+
+                        <span
+                                class="skill"
+                                th:text="${candidate.skills}">
+
+                            Java
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- RESUME -->
+
+                    <td>
+
+                        <div
+                                class="resume-name"
+                                th:text="${candidate.resumeFileName}">
+
+                            resume.pdf
+
+                        </div>
+
+                        <span
+                                class="uploaded"
+                                th:if="${candidate.hasResume()}">
+
+                            ✓ Uploaded
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        <span
+                                class="status pending"
+                                th:if="${candidate.isPending()}">
+
+                            ⏳ PENDING
+
+                        </span>
+
+
+                        <span
+                                class="status shortlisted"
+                                th:if="${candidate.isShortlisted()}">
+
+                            ✓ SHORTLISTED
+
+                        </span>
+
+
+                        <span
+                                class="status rejected"
+                                th:if="${candidate.isRejected()}">
+
+                            ✕ REJECTED
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div
+                                class="actions"
+                                th:if="${candidate.hasResume()}">
+
+
+                            <!-- VIEW -->
+
+                            <a
+                                    class="action-btn view-btn"
+                                    th:href="@{/resumes/view/{id}(id=${candidate.id})}"
+                                    target="_blank">
+
+                                👁 View
+
+                            </a>
+
+
+                            <!-- DOWNLOAD -->
+
+                            <a
+                                    class="action-btn download-btn"
+                                    th:href="@{/resumes/download/{id}(id=${candidate.id})}">
+
+                                ⬇ Download
+
+                            </a>
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                    class="delete-form"
+                                    th:action="@{/resumes/delete/{id}(id=${candidate.id})}"
+                                    method="post"
+                                    onsubmit="return confirm('Are you sure you want to delete this candidate and resume?');">
+
+                                <button
+                                        type="submit"
+                                        class="action-btn delete-btn">
+
+                                    🗑 Delete
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+
+                        <span
+                                th:unless="${candidate.hasResume()}"
+                                style="color:#94a3b8;font-size:12px;">
+
+                            No resume
+
+                        </span>
+
+                    </td>
+
+
+                </tr>
+
+
+                <!-- =================================================
+                     EMPTY LIST
+                     ================================================= -->
+
+                <tr
+                        th:if="${#lists.isEmpty(candidates)}">
+
+                    <td
+                            colspan="7"
+                            class="empty">
+
+                        📄 No candidates added yet.
+
+                    </td>
+
+                </tr>
+
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>

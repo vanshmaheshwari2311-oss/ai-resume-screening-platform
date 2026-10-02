@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Job Applications</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fa;color:#111827}.nav{background:#111827;color:white;padding:20px 5%;display:flex;justify-content:space-between}.nav a{color:white;text-decoration:none;margin-left:18px}.container{width:94%;max-width:1300px;margin:30px auto}.card{background:white;padding:24px;border-radius:16px;box-shadow:0 5px 22px rgba(0,0,0,.07);overflow:auto}table{width:100%;border-collapse:collapse}th,td{padding:13px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}.status{font-weight:bold}.actions{display:flex;gap:6px;flex-wrap:wrap}.btn{border:0;padding:8px 11px;border-radius:7px;background:#2563eb;color:white;cursor:pointer}.reject{background:#dc2626}.review{background:#64748b}.muted{color:#64748b}
+</style></head>
+<body>
+<header class="nav"><strong>🤖 Admin — Job Applications</strong><div><a href="/dashboard">Dashboard</a><a href="/candidate-management">Candidates</a><a href="/job-management">Jobs</a><a href="/logout">Logout</a></div></header>
+<main class="container"><div class="card"><h1>Candidate Applications</h1><p class="muted">Applications submitted by candidate accounts. Candidate users cannot edit these recruiter records.</p>
+<p th:if="${#lists.isEmpty(applications)}">No applications yet.</p>
+<table th:if="${!#lists.isEmpty(applications)}"><thead><tr><th>Candidate</th><th>Job</th><th>Resume</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody><tr th:each="application : ${applications}">
+<td><strong th:text="${application.applicantUser.fullName}">Candidate</strong><br><span th:text="${application.applicantUser.email}">email</span></td>
+<td th:text="${application.job.title}">Job</td>
+<td><span th:text="${application.candidate.resumeFileName}">resume.pdf</span></td>
+<td th:text="${application.appliedAt}">Date</td>
+<td class="status" th:text="${application.status}">SUBMITTED</td>
+<td><div class="actions">
+<form th:action="@{/applications/status/{id}(id=${application.id})}" method="post"><input type="hidden" name="status" value="UNDER_REVIEW"><button class="btn review">Review</button></form>
+<form th:action="@{/applications/status/{id}(id=${application.id})}" method="post"><input type="hidden" name="status" value="SHORTLISTED"><button class="btn">Shortlist</button></form>
+<form th:action="@{/applications/status/{id}(id=${application.id})}" method="post"><input type="hidden" name="status" value="REJECTED"><button class="btn reject">Reject</button></form>
+</div></td>
+</tr></tbody></table>
+</div></main>
+</body></html>

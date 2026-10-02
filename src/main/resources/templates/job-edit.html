@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Job</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #111827;
+        }
+
+        .navbar {
+            background: #111827;
+            color: white;
+            padding: 22px 50px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .dashboard-btn {
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+
+            padding: 12px 22px;
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1000px;
+            margin: 40px auto 60px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 22px;
+            margin-bottom: 28px;
+        }
+
+        .header h2 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .status {
+            display: inline-block;
+            margin-top: 15px;
+
+            padding: 8px 15px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+
+            padding: 13px 15px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
+            font-family: Arial, sans-serif;
+
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37,99,235,0.12);
+        }
+
+        textarea {
+            min-height: 130px;
+
+            resize: vertical;
+        }
+
+        .help {
+            margin-top: 6px;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            margin-top: 30px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            border: none;
+
+            padding: 13px 22px;
+
+            border-radius: 9px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            display: inline-block;
+        }
+
+        .save {
+            background: #16a34a;
+            color: white;
+        }
+
+        .cancel {
+            background: #64748b;
+            color: white;
+        }
+
+        .view {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 Edit Job
+    </h1>
+
+    <a
+        href="/dashboard"
+        class="dashboard-btn">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<div class="container">
+
+
+    <div class="card">
+
+
+        <!-- ====================================================
+             HEADER
+             ==================================================== -->
+
+        <div class="header">
+
+            <h2>
+                ✏ Edit Recruitment Job
+            </h2>
+
+            <p>
+                Update the job details and requirements below.
+            </p>
+
+
+            <!-- CURRENT STATUS -->
+
+            <span
+                th:if="${job.status == 'ACTIVE'}"
+                class="status active">
+
+                🟢 ACTIVE
+
+            </span>
+
+
+            <span
+                th:if="${job.status == 'INACTIVE'}"
+                class="status inactive">
+
+                🔴 INACTIVE
+
+            </span>
+
+        </div>
+
+
+        <!-- ====================================================
+             EDIT FORM
+             ==================================================== -->
+
+        <form
+            action="/jobs/update"
+            method="post">
+
+
+            <!-- JOB ID -->
+
+            <input
+                type="hidden"
+                name="id"
+                th:value="${job.id}">
+
+
+            <!-- =================================================
+                 TITLE
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="title">
+                    Job Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    th:value="${job.title}"
+                    placeholder="Example: Java Spring Boot Developer"
+                    required>
+
+            </div>
+
+            <div class="form-group">
+                <label for="recruiterName">Recruiter / Contact Name</label>
+                <input type="text" id="recruiterName" name="recruiterName"
+                       th:value="${job.recruiterName}" placeholder="Example: Priya Shah">
+            </div>
+
+            <div class="form-group">
+                <label for="recruiterEmail">Recruiter Contact Email</label>
+                <input type="email" id="recruiterEmail" name="recruiterEmail"
+                       th:value="${job.recruiterEmail}" placeholder="recruiter@company.com">
+            </div>
+
+            <div class="form-group">
+                <label for="location">Job Location</label>
+                <input type="text" id="location" name="location"
+                       th:value="${job.location}" placeholder="Example: Vadodara / Remote">
+            </div>
+
+
+            <!-- =================================================
+                 DESCRIPTION
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="description">
+                    Job Description
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Enter job description..."
+                    required
+                    th:text="${job.description}"></textarea>
+
+            </div>
+
+
+            <!-- =================================================
+                 REQUIRED SKILLS
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="requiredSkills">
+                    Required Skills
+                </label>
+
+                <input
+                    type="text"
+                    id="requiredSkills"
+                    name="requiredSkills"
+                    th:value="${job.requiredSkills}"
+                    placeholder="Java, Spring Boot, MySQL"
+                    required>
+
+                <div class="help">
+                    Separate skills using commas.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PREFERRED SKILLS
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="preferredSkills">
+                    Preferred Skills
+                </label>
+
+                <input
+                    type="text"
+                    id="preferredSkills"
+                    name="preferredSkills"
+                    th:value="${job.preferredSkills}"
+                    placeholder="AWS, Docker, Kubernetes">
+
+                <div class="help">
+                    These skills improve candidate ranking but are
+                    not mandatory.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 EXPERIENCE
+                 ================================================= -->
+
+            <div class="form-group">
+
+                <label for="experience">
+                    Required Experience
+                </label>
+
+                <input
+                    type="text"
+                    id="experience"
+                    name="experience"
+                    th:value="${job.experience}"
+                    placeholder="Example: 2"
+                    required>
+
+                <div class="help">
+                    Enter the required years of experience.
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIONS
+                 ================================================= -->
+
+            <div class="actions">
+
+
+                <!-- SAVE -->
+
+                <button
+                    type="submit"
+                    class="btn save">
+
+                    💾 Save Changes
+
+                </button>
+
+
+                <!-- CANCEL -->
+
+                <a
+                    href="/job-management"
+                    class="btn cancel">
+
+                    ← Cancel
+
+                </a>
+
+
+                <!-- VIEW -->
+
+                <a
+                    th:href="@{/jobs/view/{id}(id=${job.id})}"
+                    class="btn view">
+
+                    👁 View Job
+
+                </a>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

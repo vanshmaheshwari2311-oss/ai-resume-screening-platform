@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Job Management</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            color: #111827;
+        }
+
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .navbar {
+            background: #111827;
+            color: white;
+
+            padding: 22px 50px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .dashboard-btn {
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 12px 22px;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+        .dashboard-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           MAIN CONTAINER
+           ===================================================== */
+
+        .container {
+            width: 92%;
+            max-width: 1500px;
+
+            margin: 35px auto 60px;
+        }
+
+        /* =====================================================
+           HEADER
+           ===================================================== */
+
+        .header-card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            margin-bottom: 25px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+        .header-card h2 {
+            margin: 0 0 8px;
+
+            font-size: 28px;
+        }
+
+        .header-card p {
+            margin: 0;
+
+            color: #64748b;
+        }
+
+        .job-count {
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 14px 22px;
+
+            border-radius: 30px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+        /* =====================================================
+           STATISTICS
+           ===================================================== */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.06);
+
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-title {
+            color: #64748b;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        .stat-number {
+            font-size: 30px;
+
+            font-weight: 800;
+        }
+
+        .total-number {
+            color: #2563eb;
+        }
+
+        .active-number {
+            color: #16a34a;
+        }
+
+        .inactive-number {
+            color: #dc2626;
+        }
+
+        /* =====================================================
+           MANAGEMENT CARD
+           ===================================================== */
+
+        .management-card {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            overflow-x: auto;
+        }
+
+        /* =====================================================
+           TOOLBAR
+           ===================================================== */
+
+        .toolbar {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+
+            min-width: 280px;
+        }
+
+        .search-box input {
+            width: 100%;
+
+            padding: 14px 16px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 10px;
+
+            font-size: 15px;
+
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37,99,235,0.12);
+        }
+
+        /* =====================================================
+           BUTTONS
+           ===================================================== */
+
+        .btn {
+            display: inline-block;
+
+            border: none;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background: #16a34a;
+
+            font-size: 14px;
+        }
+
+        .add-btn:hover {
+            background: #15803d;
+        }
+
+        .filter-btn {
+            background: white;
+
+            color: #475569;
+
+            border: 1px solid #cbd5e1;
+        }
+
+        .filter-btn.active {
+            background: #2563eb;
+
+            color: white;
+
+            border-color: #2563eb;
+        }
+
+        .view-btn {
+            background: #2563eb;
+        }
+
+        .edit-btn {
+            background: #7c3aed;
+        }
+
+        .active-btn {
+            background: #16a34a;
+        }
+
+        .inactive-btn {
+            background: #d97706;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        /* =====================================================
+           FILTERS
+           ===================================================== */
+
+        .filters {
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        /* =====================================================
+           TABLE
+           ===================================================== */
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1100px;
+        }
+
+        thead {
+            background: #111827;
+
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+
+            text-align: left;
+
+            font-size: 14px;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 18px 16px;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* =====================================================
+           JOB TITLE
+           ===================================================== */
+
+        .job-title {
+            font-size: 17px;
+
+            font-weight: bold;
+        }
+
+        .job-description {
+            margin-top: 5px;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            max-width: 300px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+        /* =====================================================
+           SKILLS
+           ===================================================== */
+
+        .skills {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 5px;
+
+            max-width: 280px;
+        }
+
+        .skill {
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 6px 9px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+        .preferred-skill {
+            background: #f5f3ff;
+
+            color: #7c3aed;
+        }
+
+        /* =====================================================
+           STATUS
+           ===================================================== */
+
+        .status {
+            display: inline-block;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            white-space: nowrap;
+        }
+
+        .active-status {
+            background: #dcfce7;
+
+            color: #166534;
+        }
+
+        .inactive-status {
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        /* =====================================================
+           EXPERIENCE
+           ===================================================== */
+
+        .experience {
+            font-weight: bold;
+
+            color: #475569;
+        }
+
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
+
+        .actions {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            min-width: 280px;
+        }
+
+        .inline-form {
+            display: inline;
+            margin: 0;
+        }
+
+        /* =====================================================
+           NO RESULTS
+           ===================================================== */
+
+        .no-results {
+            display: none;
+
+            text-align: center;
+
+            padding: 60px 20px;
+
+            color: #64748b;
+        }
+
+        .no-results-icon {
+            font-size: 50px;
+
+            margin-bottom: 12px;
+        }
+
+        .no-results h3 {
+            color: #111827;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .stats-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+            .navbar h1 {
+                font-size: 21px;
+            }
+
+            .container {
+                width: 95%;
+            }
+
+            .header-card {
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 Job Management
+    </h1>
+
+    <a
+        href="/dashboard"
+        class="dashboard-btn">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<div class="container">
+
+
+    <!-- ========================================================
+         HEADER
+         ======================================================== -->
+
+    <div class="header-card">
+
+        <div>
+
+            <h2>
+                💼 Job Management
+            </h2>
+
+            <p>
+                Create, manage and organize recruitment jobs.
+            </p>
+
+        </div>
+
+
+        <div class="job-count">
+
+            Total Jobs:
+
+            <span th:text="${totalJobs}">
+                0
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         STATISTICS
+         ======================================================== -->
+
+    <div class="stats-grid">
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                TOTAL JOBS
+            </div>
+
+            <div
+                class="stat-number total-number"
+                th:text="${totalJobs}">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                ACTIVE JOBS
+            </div>
+
+            <div
+                class="stat-number active-number"
+                th:text="${activeJobs}">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                INACTIVE JOBS
+            </div>
+
+            <div
+                class="stat-number inactive-number"
+                id="inactiveCount">
+
+                0
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ========================================================
+         MANAGEMENT
+         ======================================================== -->
+
+    <div class="management-card">
+
+
+        <!-- TOOLBAR -->
+
+        <div class="toolbar">
+
+
+            <!-- SEARCH -->
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="🔎 Search job title, skills or description...">
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div class="filters">
+
+
+                <button
+                    type="button"
+                    class="btn filter-btn active"
+                    data-filter="ALL">
+
+                    All
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn filter-btn"
+                    data-filter="ACTIVE">
+
+                    🟢 Active
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn filter-btn"
+                    data-filter="INACTIVE">
+
+                    🔴 Inactive
+
+                </button>
+
+
+                <a
+                    href="/jobs"
+                    class="btn add-btn">
+
+                    ➕ Add Job
+
+                </a>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ====================================================
+             JOB TABLE
+             ==================================================== -->
+
+        <table
+            id="jobTable"
+            th:if="${jobs != null and !#lists.isEmpty(jobs)}">
+
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+
+                    <th>Job</th>
+
+                    <th>Required Skills</th>
+
+                    <th>Preferred Skills</th>
+
+                    <th>Experience</th>
+
+                    <th>Status</th>
+
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                <tr
+                    th:each="job, stat : ${jobs}"
+                    th:attr="data-status=${job.status}">
+
+
+                    <!-- NUMBER -->
+
+                    <td>
+
+                        <strong
+                            th:text="${stat.count}">
+
+                            1
+
+                        </strong>
+
+                    </td>
+
+
+                    <!-- JOB -->
+
+                    <td>
+
+                        <div
+                            class="job-title"
+                            th:text="${job.title}">
+
+                            Java Developer
+
+                        </div>
+
+
+                        <div
+                            class="job-description"
+                            th:text="${job.description}">
+
+                            Job description
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- REQUIRED SKILLS -->
+
+                    <td>
+
+                        <div
+                            class="skills"
+                            th:if="${job.requiredSkills != null and !job.requiredSkills.isBlank()}">
+
+
+                            <span
+                                class="skill"
+                                th:each="skill : ${#strings.arraySplit(job.requiredSkills, ',')}"
+                                th:text="${#strings.trim(skill)}">
+
+                                Java
+
+                            </span>
+
+
+                        </div>
+
+
+                        <span
+                            th:if="${job.requiredSkills == null or job.requiredSkills.isBlank()}"
+                            style="color:#94a3b8;">
+
+                            None
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- PREFERRED SKILLS -->
+
+                    <td>
+
+                        <div
+                            class="skills"
+                            th:if="${job.preferredSkills != null and !job.preferredSkills.isBlank()}">
+
+
+                            <span
+                                class="skill preferred-skill"
+                                th:each="skill : ${#strings.arraySplit(job.preferredSkills, ',')}"
+                                th:text="${#strings.trim(skill)}">
+
+                                AWS
+
+                            </span>
+
+
+                        </div>
+
+
+                        <span
+                            th:if="${job.preferredSkills == null or job.preferredSkills.isBlank()}"
+                            style="color:#94a3b8;">
+
+                            None
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- EXPERIENCE -->
+
+                    <td>
+
+                        <span
+                            class="experience"
+                            th:text="${job.experience != null and !job.experience.isBlank()
+                            ? job.experience + ' years'
+                            : 'Not specified'}">
+
+                            2 years
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        <span
+                            th:if="${job.status == 'ACTIVE'}"
+                            class="status active-status">
+
+                            🟢 ACTIVE
+
+                        </span>
+
+
+                        <span
+                            th:if="${job.status == 'INACTIVE'}"
+                            class="status inactive-status">
+
+                            🔴 INACTIVE
+
+                        </span>
+
+
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div class="actions">
+
+
+                            <!-- VIEW -->
+
+                            <a
+                                class="btn view-btn"
+                                th:href="@{/jobs/view/{id}(id=${job.id})}">
+
+                                👁 View
+
+                            </a>
+
+
+                            <!-- EDIT -->
+
+                            <a
+                                class="btn edit-btn"
+                                th:href="@{/jobs/edit/{id}(id=${job.id})}">
+
+                                ✏ Edit
+
+                            </a>
+
+
+                            <!-- ACTIVATE -->
+
+                            <form
+                                class="inline-form"
+                                th:if="${job.status != 'ACTIVE'}"
+                                th:action="@{/jobs/activate/{id}(id=${job.id})}"
+                                method="post">
+
+                                <button
+                                    type="submit"
+                                    class="btn active-btn">
+
+                                    🟢 Activate
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- DEACTIVATE -->
+
+                            <form
+                                class="inline-form"
+                                th:if="${job.status == 'ACTIVE'}"
+                                th:action="@{/jobs/deactivate/{id}(id=${job.id})}"
+                                method="post">
+
+                                <button
+                                    type="submit"
+                                    class="btn inactive-btn">
+
+                                    ⏸ Deactivate
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                class="inline-form"
+                                th:action="@{/jobs/delete/{id}(id=${job.id})}"
+                                method="post"
+                                onsubmit="return confirm('Are you sure you want to delete this job?');">
+
+                                <button
+                                    type="submit"
+                                    class="btn delete-btn">
+
+                                    🗑 Delete
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+            </tbody>
+
+
+        </table>
+
+
+        <!-- ====================================================
+             NO SEARCH RESULTS
+             ==================================================== -->
+
+        <div
+            id="noResults"
+            class="no-results">
+
+            <div class="no-results-icon">
+                🔍
+            </div>
+
+            <h3>
+                No Jobs Found
+            </h3>
+
+            <p>
+                Try another search or status filter.
+            </p>
+
+        </div>
+
+
+        <!-- ====================================================
+             NO JOBS
+             ==================================================== -->
+
+        <div
+            th:if="${jobs == null or #lists.isEmpty(jobs)}"
+            style="
+                text-align:center;
+                padding:60px;
+                color:#64748b;
+            ">
+
+            <div style="font-size:50px;">
+                💼
+            </div>
+
+            <h3 style="color:#111827;">
+                No Jobs Available
+            </h3>
+
+            <p>
+                Create your first recruitment job.
+            </p>
+
+            <a
+                href="/jobs"
+                class="btn add-btn">
+
+                ➕ Create Job
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+
+<script>
+
+    const searchInput =
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    const filterButtons =
+        document.querySelectorAll(
+            ".filter-btn"
+        );
+
+
+    const rows =
+        document.querySelectorAll(
+            "#jobTable tbody tr"
+        );
+
+
+    const noResults =
+        document.getElementById(
+            "noResults"
+        );
+
+
+    const inactiveCount =
+        document.getElementById(
+            "inactiveCount"
+        );
+
+
+    /*
+     * =========================================================
+     * COUNT INACTIVE JOBS
+     * =========================================================
+     */
+
+    function updateInactiveCount() {
+
+        let inactive = 0;
+
+
+        rows.forEach(function(row) {
+
+            const status =
+                (
+                    row.getAttribute(
+                        "data-status"
+                    )
+                    || "ACTIVE"
+                ).toUpperCase();
+
+
+            if (
+                status === "INACTIVE"
+            ) {
+
+                inactive++;
+
+            }
+
+        });
+
+
+        inactiveCount.textContent =
+            inactive;
+
+    }
+
+
+    /*
+     * =========================================================
+     * FILTER JOBS
+     * =========================================================
+     */
+
+    let currentFilter = "ALL";
+
+
+    function filterJobs() {
+
+        const search =
+            searchInput.value
+                .toLowerCase()
+                .trim();
+
+
+        let visible = 0;
+
+
+        rows.forEach(function(row) {
+
+
+            const status =
+                (
+                    row.getAttribute(
+                        "data-status"
+                    )
+                    || "ACTIVE"
+                ).toUpperCase();
+
+
+            const text =
+                row.textContent
+                    .toLowerCase();
+
+
+            const searchMatch =
+                text.includes(search);
+
+
+            const statusMatch =
+                currentFilter === "ALL"
+                || status === currentFilter;
+
+
+            if (
+                searchMatch
+                && statusMatch
+            ) {
+
+                row.style.display = "";
+
+                visible++;
+
+            } else {
+
+                row.style.display =
+                    "none";
+
+            }
+
+        });
+
+
+        if (visible === 0) {
+
+            noResults.style.display =
+                "block";
+
+        } else {
+
+            noResults.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    /*
+     * =========================================================
+     * SEARCH
+     * =========================================================
+     */
+
+    searchInput.addEventListener(
+        "input",
+        filterJobs
+    );
+
+
+    /*
+     * =========================================================
+     * FILTER BUTTONS
+     * =========================================================
+     */
+
+    filterButtons.forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+
+                    filterButtons.forEach(
+                        function(btn) {
+
+                            btn.classList.remove(
+                                "active"
+                            );
+
+                        }
+                    );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    currentFilter =
+                        button.getAttribute(
+                            "data-filter"
+                        );
+
+
+                    filterJobs();
+
+                }
+            );
+
+        }
+    );
+
+
+    /*
+     * =========================================================
+     * INITIAL LOAD
+     * =========================================================
+     */
+
+    updateInactiveCount();
+
+    filterJobs();
+
+</script>
+
+
+</body>
+
+</html>

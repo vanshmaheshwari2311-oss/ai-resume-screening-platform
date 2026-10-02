@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Screening</title>
+
+    <style>
+
+        :root {
+            --navy: #0f172a;
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --green: #16a34a;
+            --green-bg: #ecfdf5;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --purple: #7c3aed;
+            --purple-bg: #f5f3ff;
+            --cyan: #0891b2;
+            --cyan-bg: #ecfeff;
+            --text: #111827;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --surface: #ffffff;
+            --page: #f1f5f9;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--page);
+            color: var(--text);
+        }
+
+        /* =====================================================
+           NAVBAR
+           ===================================================== */
+
+        .navbar {
+            background: linear-gradient(135deg, #0f172a, #172554);
+            color: white;
+            padding: 22px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.18);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        .dashboard {
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+
+            padding: 12px 22px;
+
+            border-radius: 10px;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+        }
+
+        .dashboard:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           MAIN CONTAINER
+           ===================================================== */
+
+        .container {
+            width: 92%;
+            max-width: 1450px;
+
+            margin: 34px auto 60px;
+        }
+
+
+        /* =====================================================
+           GENERAL CARD
+           ===================================================== */
+
+        .card {
+            background: var(--surface);
+
+            border: 1px solid rgba(226, 232, 240, 0.9);
+
+            border-radius: 18px;
+
+            padding: 30px;
+
+            margin-bottom: 24px;
+
+            box-shadow: var(--shadow);
+
+            /* Important: prevents Selected Job content clipping */
+            overflow: visible;
+        }
+
+
+        h2 {
+            margin: 0 0 10px;
+
+            font-size: 25px;
+
+            letter-spacing: -0.3px;
+        }
+
+
+        /* =====================================================
+           FORM
+           ===================================================== */
+
+        label {
+            display: block;
+
+            font-weight: bold;
+
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+
+        select,
+        input {
+            width: 100%;
+
+            padding: 15px 16px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 11px;
+
+            font-size: 16px;
+
+            background: white;
+
+            color: var(--text);
+
+            outline: none;
+
+            transition: 0.2s;
+        }
+
+
+        select:focus,
+        input:focus {
+            border-color: var(--blue);
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+
+        /* =====================================================
+           BUTTON
+           ===================================================== */
+
+        button {
+            margin-top: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #1d4ed8
+                );
+
+            color: white;
+
+            border: none;
+
+            padding: 15px 26px;
+
+            border-radius: 11px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 18px rgba(37, 99, 235, 0.22);
+
+            transition: 0.2s;
+        }
+
+
+        button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 24px rgba(37, 99, 235, 0.28);
+        }
+
+
+        /* =====================================================
+           ERROR
+           ===================================================== */
+
+        .error {
+            background: #fee2e2;
+
+            color: #991b1b;
+
+            border: 1px solid #fecaca;
+
+            padding: 15px 18px;
+
+            border-radius: 10px;
+
+            margin: 18px 0;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           SELECTED JOB
+           ===================================================== */
+
+        .job-info {
+            background:
+                linear-gradient(
+                    135deg,
+                    #eff6ff,
+                    #f8fbff
+                );
+
+            border: 1px solid #bfdbfe;
+
+            border-left: 5px solid var(--blue);
+
+            padding: 24px;
+
+            border-radius: 14px;
+
+            margin-top: 18px;
+
+            min-height: 0;
+
+            height: auto;
+
+            overflow: visible;
+
+            position: relative;
+        }
+
+
+        .job-info h3 {
+            margin: 0 0 18px;
+
+            font-size: 21px;
+
+            color: #0f172a;
+        }
+
+
+        .job-info p {
+            margin: 10px 0;
+
+            line-height: 1.55;
+
+            color: #334155;
+        }
+
+
+        .job-info strong {
+            color: #0f172a;
+        }
+
+
+        .job-info .required-skills {
+            display: inline-block;
+
+            color: #1d4ed8;
+
+            font-weight: 700;
+
+            line-height: 1.7;
+        }
+
+
+        .required-skills {
+            font-weight: bold;
+
+            color: #1d4ed8;
+        }
+
+
+        /* =====================================================
+           ATS SCORE
+           ===================================================== */
+
+        .score {
+            text-align: center;
+
+            padding: 12px 10px 6px;
+        }
+
+
+        .score-label {
+            color: var(--muted);
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 10px;
+        }
+
+
+        .score-number {
+            font-size: clamp(64px, 8vw, 92px);
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            color: var(--blue);
+
+            letter-spacing: -4px;
+
+            margin: 5px 0 18px;
+        }
+
+
+        .score p {
+            margin: 7px 0;
+
+            color: var(--muted);
+
+            font-size: 15px;
+        }
+
+
+        .score strong {
+            color: var(--text);
+        }
+
+
+        /* =====================================================
+           SCORE SUMMARY PILLS
+           ===================================================== */
+
+        .score-summary {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            margin-top: 18px;
+        }
+
+
+        .summary-pill {
+            padding: 9px 15px;
+
+            border-radius: 999px;
+
+            font-size: 13px;
+
+            font-weight: bold;
+
+            background: #eff6ff;
+
+            color: #1d4ed8;
+        }
+
+
+        /* =====================================================
+           SCORE BREAKDOWN
+           ===================================================== */
+
+        .breakdown-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 22px;
+        }
+
+
+        .breakdown-box {
+            background: #f8fafc;
+
+            border: 1px solid var(--border);
+
+            border-radius: 15px;
+
+            padding: 23px;
+        }
+
+
+        .breakdown-box h3 {
+            margin: 0 0 10px;
+        }
+
+
+        .required-title {
+            color: var(--blue);
+        }
+
+
+        .preferred-title {
+            color: var(--purple);
+        }
+
+
+        .score-points {
+            font-size: 30px;
+
+            font-weight: 800;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =====================================================
+           PROGRESS BAR
+           ===================================================== */
+
+        .progress-container {
+            width: 100%;
+
+            height: 13px;
+
+            background: #e2e8f0;
+
+            border-radius: 999px;
+
+            overflow: hidden;
+
+            margin: 13px 0 15px;
+        }
+
+
+        .required-progress,
+        .preferred-progress {
+            height: 100%;
+
+            border-radius: 999px;
+
+            min-width: 0;
+        }
+
+
+        .required-progress {
+            background:
+                linear-gradient(
+                    90deg,
+                    #2563eb,
+                    #60a5fa
+                );
+        }
+
+
+        .preferred-progress {
+            background:
+                linear-gradient(
+                    90deg,
+                    #7c3aed,
+                    #a78bfa
+                );
+        }
+
+
+        .breakdown-box p {
+            color: var(--muted);
+
+            line-height: 1.55;
+
+            margin: 0;
+        }
+
+
+        /* =====================================================
+           SKILL RESULT GRID
+           ===================================================== */
+
+        .result-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+        }
+
+
+        .result-box {
+            padding: 22px;
+
+            margin-bottom: 0;
+
+            min-height: 215px;
+
+            box-shadow: none;
+        }
+
+
+        .result-box h3 {
+            margin: 0 0 18px;
+
+            font-size: 17px;
+        }
+
+
+        .result-box ul {
+            padding-left: 20px;
+
+            margin: 0;
+        }
+
+
+        .result-box li {
+            margin-bottom: 9px;
+
+            line-height: 1.35;
+        }
+
+
+        .result-box p {
+            color: var(--muted);
+        }
+
+
+        /* =====================================================
+           SKILL COLORS
+           ===================================================== */
+
+        .matched {
+            color: var(--green);
+        }
+
+
+        .missing {
+            color: var(--red);
+        }
+
+
+        .preferred {
+            color: var(--purple);
+        }
+
+
+        .detected {
+            color: var(--cyan);
+        }
+
+
+        /* =====================================================
+           SKILL CARD BACKGROUNDS
+           ===================================================== */
+
+        .result-box:nth-child(1) {
+            background: var(--green-bg);
+
+            border: 1px solid #bbf7d0;
+        }
+
+
+        .result-box:nth-child(2) {
+            background: var(--red-bg);
+
+            border: 1px solid #fecaca;
+        }
+
+
+        .result-box:nth-child(3) {
+            background: var(--purple-bg);
+
+            border: 1px solid #ddd6fe;
+        }
+
+
+        .result-box:nth-child(4) {
+            background: var(--cyan-bg);
+
+            border: 1px solid #a5f3fc;
+        }
+
+
+        /* =====================================================
+           RECOMMENDATION
+           ===================================================== */
+
+        .recommendation {
+            background:
+                linear-gradient(
+                    135deg,
+                    #ecfdf5,
+                    #f0fdf4
+                );
+
+            border: 1px solid #bbf7d0;
+
+            border-left: 5px solid var(--green);
+        }
+
+
+        .recommendation h3 {
+            color: #15803d;
+
+            margin: 0 0 10px;
+
+            font-size: 18px;
+        }
+
+
+        .recommendation p {
+            margin: 0;
+
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .result-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .breakdown-grid,
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+
+            .navbar h1 {
+                font-size: 21px;
+            }
+
+
+            .container {
+                width: 94%;
+            }
+
+
+            .card {
+                padding: 22px;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .navbar h1 {
+                font-size: 18px;
+            }
+
+
+            .dashboard {
+                padding: 10px 14px;
+
+                font-size: 14px;
+            }
+
+
+            .score-number {
+                font-size: 68px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================================================= -->
+<!-- NAVBAR -->
+<!-- ========================================================= -->
+
+<div class="navbar">
+
+    <h1>
+        🤖 AI Resume Screening
+    </h1>
+
+
+    <a
+        href="/dashboard"
+        class="dashboard">
+
+        Dashboard
+
+    </a>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MAIN CONTAINER -->
+<!-- ========================================================= -->
+
+<div class="container">
+
+
+    <!-- ===================================================== -->
+    <!-- ANALYSIS FORM -->
+    <!-- ===================================================== -->
+
+    <div class="card">
+
+        <h2>
+            Analyze Candidate Resume
+        </h2>
+
+
+        <p>
+            Select a candidate and a saved job.
+            The system will automatically compare the
+            resume against the job requirements.
+        </p>
+
+
+        <!-- ERROR -->
+
+        <div
+            th:if="${error}"
+            class="error"
+            th:text="${error}">
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form
+            action="/ai-screening/analyze"
+            method="get">
+
+
+            <!-- CANDIDATE -->
+
+            <label for="candidateId">
+
+                Select Candidate
+
+            </label>
+
+
+            <select
+                id="candidateId"
+                name="candidateId"
+                required>
+
+
+                <option value="">
+
+                    -- Select Candidate --
+
+                </option>
+
+
+                <option
+                    th:each="candidateItem : ${candidates}"
+
+                    th:value="${candidateItem.id}"
+
+                    th:text="${candidateItem.name + ' - ' + candidateItem.email}"
+
+                    th:selected="${selectedCandidateId != null and candidateItem.id == selectedCandidateId}">
+
+                </option>
+
+
+            </select>
+
+
+            <!-- JOB -->
+
+            <label for="jobId">
+
+                Select Job
+
+            </label>
+
+
+            <select
+                id="jobId"
+                name="jobId"
+                required>
+
+
+                <option value="">
+
+                    -- Select Job --
+
+                </option>
+
+
+                <option
+                    th:each="jobItem : ${jobs}"
+
+                    th:value="${jobItem.id}"
+
+                    th:text="${jobItem.title}"
+
+                    th:selected="${job != null and jobItem.id == job.id}">
+
+                </option>
+
+
+            </select>
+
+
+            <button type="submit">
+
+                🚀 Analyze Resume
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- SELECTED JOB -->
+    <!-- ===================================================== -->
+
+    <div
+        class="card"
+        th:if="${job != null}">
+
+
+        <h2>
+            📋 Selected Job
+        </h2>
+
+
+        <div class="job-info">
+
+
+            <h3
+                th:text="${job.title}">
+
+                Java Spring Boot Developer
+
+            </h3>
+
+
+            <p>
+
+                <strong>
+                    Description:
+                </strong>
+
+            </p>
+
+
+            <p
+                th:text="${job.description}">
+
+                Job description
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Required Skills:
+                </strong>
+
+            </p>
+
+
+            <p
+                class="required-skills"
+                th:text="${job.requiredSkills}">
+
+                java,spring,spring boot,mysql
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Preferred Skills:
+                </strong>
+
+            </p>
+
+
+            <p
+                th:text="${job.preferredSkills}">
+
+                java
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Experience:
+                </strong>
+
+
+                <span
+                    th:text="${job.experience}">
+
+                    2
+
+                </span>
+
+            </p>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- ATS SCORE -->
+    <!-- ===================================================== -->
+
+    <div
+        class="card"
+        th:if="${score != null}">
+
+
+        <div class="score">
+
+
+            <div class="score-label">
+
+                OVERALL ATS COMPATIBILITY
+
+            </div>
+
+
+            <div
+                class="score-number"
+                th:text="${score + '%'}">
+
+                0%
+
+            </div>
+
+
+            <p>
+
+                Candidate:
+
+                <strong
+                    th:text="${candidate.name}">
+
+                    Candidate
+
+                </strong>
+
+            </p>
+
+
+            <p th:if="${job != null}">
+
+                Job:
+
+                <strong
+                    th:text="${job.title}">
+
+                    Job
+
+                </strong>
+
+            </p>
+
+
+            <div class="score-summary">
+
+
+                <span class="summary-pill">
+
+                    Required:
+
+                    <span
+                        th:text="${requiredScore + ' / 80'}">
+
+                        0 / 80
+
+                    </span>
+
+                </span>
+
+
+                <span class="summary-pill">
+
+                    Preferred:
+
+                    <span
+                        th:text="${preferredScore + ' / 20'}">
+
+                        0 / 20
+
+                    </span>
+
+                </span>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- SCORE BREAKDOWN -->
+    <!-- ===================================================== -->
+
+    <div
+        class="card"
+        th:if="${score != null}">
+
+
+        <h2>
+
+            📊 ATS Score Breakdown
+
+        </h2>
+
+
+        <div class="breakdown-grid">
+
+
+            <!-- REQUIRED -->
+
+            <div class="breakdown-box">
+
+
+                <h3 class="required-title">
+
+                    Required Skills — 80%
+
+                </h3>
+
+
+                <div
+                    class="score-points"
+                    th:text="${requiredScore + ' / 80'}">
+
+                    0 / 80
+
+                </div>
+
+
+                <div class="progress-container">
+
+
+                    <div
+                        class="required-progress"
+
+                        th:style="|width: ${requiredScore * 1.25}%|">
+
+                    </div>
+
+
+                </div>
+
+
+                <p>
+
+                    Required skills have the highest
+                    importance in the ATS score.
+
+                </p>
+
+
+            </div>
+
+
+
+            <!-- PREFERRED -->
+
+            <div class="breakdown-box">
+
+
+                <h3 class="preferred-title">
+
+                    Preferred Skills — 20%
+
+                </h3>
+
+
+                <div
+                    class="score-points"
+                    th:text="${preferredScore + ' / 20'}">
+
+                    0 / 20
+
+                </div>
+
+
+                <div class="progress-container">
+
+
+                    <div
+                        class="preferred-progress"
+
+                        th:style="|width: ${preferredScore * 5}%|">
+
+                    </div>
+
+
+                </div>
+
+
+                <p>
+
+                    Preferred skills improve the
+                    candidate's overall ranking.
+
+                </p>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- SKILL RESULTS -->
+    <!-- ===================================================== -->
+
+    <div
+        class="result-grid"
+        th:if="${score != null}">
+
+
+        <!-- MATCHED REQUIRED -->
+
+        <div class="card result-box">
+
+
+            <h3 class="matched">
+
+                ✅ Matched Required
+
+            </h3>
+
+
+            <ul>
+
+
+                <li
+                    th:each="skill : ${matchedSkills}"
+
+                    th:text="${skill}">
+
+                </li>
+
+
+            </ul>
+
+
+            <p
+                th:if="${#lists.isEmpty(matchedSkills)}">
+
+                No required skills matched.
+
+            </p>
+
+
+        </div>
+
+
+
+        <!-- MISSING REQUIRED -->
+
+        <div class="card result-box">
+
+
+            <h3 class="missing">
+
+                ❌ Missing Required
+
+            </h3>
+
+
+            <ul>
+
+
+                <li
+                    th:each="skill : ${missingSkills}"
+
+                    th:text="${skill}">
+
+                </li>
+
+
+            </ul>
+
+
+            <p
+                th:if="${#lists.isEmpty(missingSkills)}">
+
+                No missing required skills 🎉
+
+            </p>
+
+
+        </div>
+
+
+
+        <!-- MATCHED PREFERRED -->
+
+        <div class="card result-box">
+
+
+            <h3 class="preferred">
+
+                ⭐ Matched Preferred
+
+            </h3>
+
+
+            <ul>
+
+
+                <li
+                    th:each="skill : ${matchedPreferredSkills}"
+
+                    th:text="${skill}">
+
+                </li>
+
+
+            </ul>
+
+
+            <p
+                th:if="${#lists.isEmpty(matchedPreferredSkills)}">
+
+                No preferred skills matched.
+
+            </p>
+
+
+        </div>
+
+
+
+        <!-- DETECTED -->
+
+        <div class="card result-box">
+
+
+            <h3 class="detected">
+
+                🤖 Detected From Resume
+
+            </h3>
+
+
+            <ul>
+
+
+                <li
+                    th:each="skill : ${detectedSkills}"
+
+                    th:text="${skill}">
+
+                </li>
+
+
+            </ul>
+
+
+            <p
+                th:if="${#lists.isEmpty(detectedSkills)}">
+
+                No skills detected.
+
+            </p>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- PREFERRED SKILL GAPS -->
+    <!-- ===================================================== -->
+
+    <div
+        class="card"
+        th:if="${score != null}">
+
+
+        <h2>
+
+            ⭐ Preferred Skill Gaps
+
+        </h2>
+
+
+        <ul>
+
+
+            <li
+                th:each="skill : ${missingPreferredSkills}"
+
+                th:text="${skill}">
+
+            </li>
+
+
+        </ul>
+
+
+        <p
+            th:if="${#lists.isEmpty(missingPreferredSkills)}">
+
+            Excellent! All preferred skills are present. 🎉
+
+        </p>
+
+
+    </div>
+
+
+
+    <!-- ===================================================== -->
+    <!-- ATS RECOMMENDATION -->
+    <!-- ===================================================== -->
+
+    <div
+        class="card recommendation"
+        th:if="${score != null}">
+
+
+        <h3>
+
+            💡 ATS Recommendation
+
+        </h3>
+
+
+        <!-- STRONG -->
+
+        <p
+            th:if="${score >= 80}">
+
+            <strong>
+                Strong Match.
+            </strong>
+
+            This candidate has a strong compatibility
+            with the selected job and should be considered
+            for the next recruitment stage.
+
+        </p>
+
+
+        <!-- MODERATE -->
+
+        <p
+            th:if="${score >= 60 and score < 80}">
+
+            <strong>
+                Moderate Match.
+            </strong>
+
+            The candidate meets a reasonable portion
+            of the job requirements but may have some
+            skill gaps.
+
+        </p>
+
+
+        <!-- LOW -->
+
+        <p
+            th:if="${score < 60}">
+
+            <strong>
+                Low Match.
+            </strong>
+
+            The candidate is missing several important
+            requirements for this position.
+
+        </p>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

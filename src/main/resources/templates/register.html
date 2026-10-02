@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Create Candidate Account</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#eef2ff,#f8fafc);min-height:100vh;display:flex;align-items:center;justify-content:center}.card{width:500px;background:#fff;padding:40px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.12)}h1{text-align:center;margin:0 0 8px;color:#111827}.sub{text-align:center;color:#6b7280;margin-bottom:28px}.group{margin-bottom:16px}label{display:block;font-weight:bold;color:#374151;margin-bottom:7px}input{width:100%;padding:13px;border:1px solid #d1d5db;border-radius:9px;font-size:15px}button{width:100%;padding:14px;border:0;border-radius:9px;background:#2563eb;color:#fff;font-weight:bold;font-size:16px;cursor:pointer}.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:18px}.login{text-align:center;margin-top:20px;color:#64748b}.login a{color:#2563eb;font-weight:bold;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Create an Account</h1>
+<p class="sub">Create a candidate account to apply for jobs.</p>
+<div class="error" th:if="${error}" th:text="${error}"></div>
+<form action="/register" method="post">
+<div class="group"><label>Full Name</label><input name="fullName" required placeholder="Your full name"></div>
+<div class="group"><label>Email</label><input type="email" name="email" required placeholder="you@example.com"></div>
+<div class="group"><label>Phone</label><input name="phone" required placeholder="Phone number"></div>
+<div class="group"><label>Username</label><input name="username" required minlength="3" placeholder="Choose a username"></div>
+<div class="group"><label>Password</label><input type="password" name="password" required minlength="6" placeholder="At least 6 characters"></div>
+<div class="group"><label>Confirm Password</label><input type="password" name="confirmPassword" required minlength="6" placeholder="Repeat password"></div>
+<button type="submit">Create Candidate Account</button>
+</form>
+<div class="login">Already have an account? <a href="/login">Sign in</a></div>
+</div>
+</body>
+</html>

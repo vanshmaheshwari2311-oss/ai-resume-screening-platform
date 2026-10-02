@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Jobs - AI Resume Screening</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f3f6fa; color: #111827; }
+        .navbar { background: #111827; color: white; padding: 22px 50px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+        .navbar h1 { margin: 0; font-size: 27px; }
+        .navbar p { margin: 5px 0 0; color: #cbd5e1; }
+        .apply-link, .btn { background: #2563eb; color: white; padding: 12px 20px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block; }
+        .container { width: 92%; max-width: 1200px; margin: 38px auto 60px; }
+        .intro { margin-bottom: 28px; }
+        .intro h2 { margin-bottom: 8px; }
+        .intro p { color: #64748b; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(295px, 1fr)); gap: 22px; }
+        .card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 5px 22px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+        .card h3 { margin: 0 0 10px; font-size: 21px; }
+        .description { color: #475569; line-height: 1.55; min-height: 72px; }
+        .label { color: #64748b; font-size: 13px; font-weight: bold; margin-top: 14px; }
+        .tag { display: inline-block; margin: 5px 4px 0 0; background: #e0ecff; color: #1d4ed8; border-radius: 20px; padding: 6px 10px; font-size: 13px; }
+        .meta { margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb; color: #475569; line-height: 1.7; }
+        .actions { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .secondary { background: #e0ecff; color: #1d4ed8; }
+        .empty { background: white; border-radius: 14px; text-align: center; padding: 55px 25px; color: #64748b; box-shadow: 0 5px 22px rgba(0,0,0,.08); }
+        @media (max-width: 650px) { .navbar { padding: 20px; align-items: flex-start; flex-direction: column; } .container { width: 90%; } }
+    </style>
+</head>
+<body>
+<header class="navbar"><div><h1>AI Resume Screening</h1><p>Find your next opportunity</p></div><a class="apply-link" href="/apply">Apply Now</a></header>
+<main class="container">
+    <section class="intro"><h2>Available Jobs</h2><p>Explore active roles and apply directly with your resume.</p></section>
+    <section class="grid" th:if="${!#lists.isEmpty(jobs)}">
+        <article class="card" th:each="job : ${jobs}">
+            <h3 th:text="${job.title}">Java Developer</h3>
+            <p class="description" th:text="${job.description}">Job description</p>
+            <div class="label">REQUIRED SKILLS</div>
+            <div th:if="${job.requiredSkills != null and !job.requiredSkills.isBlank()}"><span class="tag" th:each="skill : ${#strings.arraySplit(job.requiredSkills, ',')}" th:text="${#strings.trim(skill)}">Java</span></div>
+            <div class="meta"><div><strong>Experience:</strong> <span th:text="${job.experience ?: 'Not specified'}">2 years</span></div><div th:if="${job.location != null and !job.location.isBlank()}"><strong>Location:</strong> <span th:text="${job.location}">Remote</span></div></div>
+            <div class="actions"><a class="btn secondary" th:href="@{/jobs/public/{id}(id=${job.id})}">View Details</a><a class="btn" th:href="@{/apply(jobId=${job.id})}">Apply Now</a></div>
+        </article>
+    </section>
+    <section class="empty" th:if="${#lists.isEmpty(jobs)}"><h3>No roles are open right now.</h3><p>Please check back soon for new opportunities.</p></section>
+</main>
+</body>
+</html>

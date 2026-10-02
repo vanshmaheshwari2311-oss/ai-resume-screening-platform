@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Apply for a Job</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f9;color:#111827}.container{max-width:760px;margin:45px auto;padding:20px}.card{background:white;padding:35px;border-radius:15px;box-shadow:0 5px 25px rgba(0,0,0,.08)}h1{margin-top:0}.subtitle{color:#64748b}.group{margin:20px 0}label{display:block;font-weight:bold;margin-bottom:7px}input,select,textarea{width:100%;padding:12px;border:1px solid #d5d9df;border-radius:8px;font-size:15px}textarea{min-height:110px}.readonly{background:#f8fafc;color:#475569}.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:20px}button{width:100%;padding:14px;border:0;border-radius:8px;background:#2563eb;color:white;font-size:16px;font-weight:bold;cursor:pointer}.links{margin-top:18px;text-align:center}.links a{color:#2563eb;text-decoration:none;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="container"><div class="card">
+<h1>Apply for a Job</h1>
+<p class="subtitle">Your account details are used automatically. Submit your resume and skills for the selected role.</p>
+<div class="error" th:if="${error}" th:text="${error}"></div>
+
+<form action="/apply/submit" method="post" enctype="multipart/form-data">
+<div class="group"><label>Full Name</label><input class="readonly" type="text" th:value="${user.fullName}" readonly></div>
+<div class="group"><label>Email</label><input class="readonly" type="email" th:value="${user.email}" readonly></div>
+<div class="group"><label>Phone</label><input class="readonly" type="text" th:value="${user.phone}" readonly></div>
+
+<div class="group"><label>Applying For</label>
+<select name="jobId" required>
+<option value="">Select a job</option>
+<option th:each="job : ${jobs}" th:value="${job.id}" th:selected="${selectedJobId != null and selectedJobId == job.id}" th:text="${job.title}">Job</option>
+</select></div>
+
+<div class="group"><label>Skills</label><textarea name="skills" required placeholder="Example: Java, Spring Boot, MySQL, HTML, CSS"></textarea></div>
+<div class="group"><label>Resume</label><input type="file" name="resume" accept=".pdf,.doc,.docx" required></div>
+<button type="submit">Submit Application</button>
+</form>
+
+<div class="links"><a href="/candidate/dashboard">← Back to Candidate Dashboard</a></div>
+</div></div>
+</body></html>
