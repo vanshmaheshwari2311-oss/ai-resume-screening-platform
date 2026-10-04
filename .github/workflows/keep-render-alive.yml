@@ -10,5 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Ping Render application
-        run: curl -f -L --max-time 30 https://ai-resume-screening-platform-04t2.onrender.com/actuator/health
+      - name: Ping Render and MySQL
+        run: |
+          curl -f -L --max-time 30 \
+            https://ai-resume-screening-platform-04t2.onrender.com/api/keep-alive
